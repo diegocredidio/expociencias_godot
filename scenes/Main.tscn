@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://bo8uyc0lpjlpj"]
+[gd_scene load_steps=13 format=3 uid="uid://bo8uyc0lpjlpj"]
 
 [ext_resource type="Script" uid="uid://dty27ima3k8sw" path="res://scripts/Main.gd" id="1_5qnwj"]
 [ext_resource type="PackedScene" uid="uid://cj8w5d1hbp0no" path="res://scenes/Player.tscn" id="2_8vhkm"]
@@ -12,30 +12,54 @@
 size = Vector3(89.4974, 1, 74.6561)
 
 [sub_resource type="StyleBoxFlat" id="ChatDialogStyle"]
-bg_color = Color(0, 0.00392157, 0.0392157, 1)
+bg_color = Color(0.1, 0.15, 0.25, 0.95)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.2, 0.6, 0.9, 1)
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+shadow_color = Color(0, 0, 0, 0.7)
+shadow_size = 12
+
+[sub_resource type="StyleBoxFlat" id="ChatHistoryStyle"]
+bg_color = Color(0.15, 0.2, 0.3, 0.9)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
-border_color = Color(0.23, 0.29, 0.36, 1)
-corner_radius_top_left = 16
-corner_radius_top_right = 16
-corner_radius_bottom_right = 16
-corner_radius_bottom_left = 16
-shadow_color = Color(0, 0, 0, 0.5)
-shadow_size = 8
+border_color = Color(0.3, 0.7, 1, 0.8)
+corner_radius_top_left = 12
+corner_radius_top_right = 12
+corner_radius_bottom_right = 12
+corner_radius_bottom_left = 12
 
-[sub_resource type="StyleBoxFlat" id="ChatHistoryStyle"]
-bg_color = Color(0.05, 0.07, 0.1, 0.9)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.19, 0.21, 0.24, 0.8)
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
+[sub_resource type="StyleBoxFlat" id="QuizButtonHoverStyle"]
+bg_color = Color(0.3, 0.4, 0.6, 0.95)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.5, 0.9, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[sub_resource type="StyleBoxFlat" id="QuizButtonStyle"]
+bg_color = Color(0.2, 0.3, 0.5, 0.9)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.4, 0.8, 1, 1)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
 
 [node name="Main" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.451453, 0)
@@ -185,7 +209,7 @@ horizontal_alignment = 1
 [node name="QuizQuestion" type="RichTextLabel" parent="UI/QuizDialog/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_colors/default_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
 theme_override_fonts/bold_font = ExtResource("5_barlow_bold")
 theme_override_font_sizes/normal_font_size = 40
@@ -199,26 +223,38 @@ layout_mode = 2
 
 [node name="OptionA" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "A) Carregando..."
 
 [node name="OptionB" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "B) Carregando..."
 
 [node name="OptionC" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "C) Carregando..."
 
 [node name="OptionD" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")
 theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "D) Carregando..."
 
 [node name="QuizCloseButton" type="Button" parent="UI/QuizDialog/VBoxContainer"]
