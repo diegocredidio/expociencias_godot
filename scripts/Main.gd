@@ -804,13 +804,36 @@ func generate_quiz_question_for_npc(npc):
 		http_request.queue_free()
 	else:
 		print("✅ Resposta de quiz recebida do proxy com sucesso")
-		# Process the quiz response directly as JSON
+		print("📨 Resposta bruta: ", response.substr(0, 200), "...")
+		
+		# First try to parse as JSON directly (new format)
 		var quiz_json = JSON.parse_string(response)
 		if quiz_json and quiz_json is Dictionary:
+			print("✅ Parsing JSON direto bem-sucedido")
 			parse_and_display_quiz_json(quiz_json)
 		else:
-			print("❌ Erro: Resposta do quiz não é JSON válido")
-			quiz_question.text = "❌ Erro: Falha ao gerar pergunta de múltipla escolha"
+			# Try to extract JSON from text response (fallback for text format)
+			print("🔄 Tentando extrair JSON do texto...")
+			var json_start = response.find("{")
+			var json_end = response.rfind("}")
+			
+			if json_start != -1 and json_end != -1 and json_end > json_start:
+				var json_text = response.substr(json_start, json_end - json_start + 1)
+				print("📨 JSON extraído: ", json_text.substr(0, 200), "...")
+				
+				var extracted_json = JSON.parse_string(json_text)
+				if extracted_json and extracted_json is Dictionary:
+					print("✅ Parsing JSON extraído bem-sucedido")
+					parse_and_display_quiz_json(extracted_json)
+				else:
+					print("❌ JSON extraído inválido")
+					# Try parsing as text format (old format)
+					parse_and_display_quiz(response)
+			else:
+				print("❌ Nenhum JSON encontrado, tentando parsing como texto")
+				# Fallback to text parsing
+				parse_and_display_quiz(response)
+		
 		http_request.queue_free()
 
 func parse_and_display_quiz_json(quiz_data: Dictionary):
@@ -819,9 +842,42 @@ func parse_and_display_quiz_json(quiz_data: Dictionary):
 	print("🔍 Matéria atual: ", current_npc_subject)
 	print("🔍 Quiz data: ", quiz_data)
 	
+	# Validate quiz data structure
+	if not quiz_data.has("question") or not quiz_data.has("options") or not quiz_data.has("correct_answer"):
+		print("❌ Estrutura de quiz inválida - campos obrigatórios ausentes")
+		quiz_question.text = "❌ Erro: Pergunta incompleta recebida"
+		return
+	
 	var question_text = quiz_data.get("question", "")
 	var options = quiz_data.get("options", [])
-	var correct_index = int(quiz_data.get("correct_answer", 0))
+	var correct_answer = quiz_data.get("correct_answer", 0)
+	
+	# Validate question text
+	if question_text == "" or question_text == null:
+		print("❌ Pergunta vazia")
+		quiz_question.text = "❌ Erro: Pergunta não recebida"
+		return
+	
+	# Validate options array
+	if not options is Array or options.size() < 4:
+		print("❌ Opções inválidas - esperado array com 4 itens, recebido: ", options)
+		quiz_question.text = "❌ Erro: Alternativas incompletas"
+		return
+	
+	# Validate correct answer
+	var correct_index = 0
+	if correct_answer is String:
+		match correct_answer.to_upper():
+			"A": correct_index = 0
+			"B": correct_index = 1
+			"C": correct_index = 2
+			"D": correct_index = 3
+			_: correct_index = 0
+	elif correct_answer is int:
+		correct_index = clamp(correct_answer, 0, 3)
+	else:
+		print("❌ Índice de resposta correta inválido: ", correct_answer)
+		correct_index = 0
 	
 	var correct_letter = ""
 	match correct_index:
@@ -835,28 +891,24 @@ func parse_and_display_quiz_json(quiz_data: Dictionary):
 	print("🔍 Correct answer: ", correct_letter, " (index ", correct_index, ")")
 	
 	# Display the quiz
-	if question_text != "" and options.size() >= 4:
-		quiz_question.text = question_text
-		quiz_option_a.text = options[0]
-		quiz_option_b.text = options[1]
-		quiz_option_c.text = options[2]
-		quiz_option_d.text = options[3]
-		
-		# Adjust button heights for long text
-		adjust_all_button_heights()
-		
-		# Store correct answer for validation
-		correct_answer_index = correct_index
-		
-		# Enable quiz buttons
-		enable_quiz_buttons()
-		
-		print("✅ Quiz exibido com sucesso!")
-		print("🎯 Pergunta: ", question_text)
-		print("🎯 Resposta correta: ", correct_letter)
-	else:
-		print("❌ Dados do quiz incompletos")
-		quiz_question.text = "❌ Erro: Pergunta incompleta"
+	quiz_question.text = question_text
+	quiz_option_a.text = options[0]
+	quiz_option_b.text = options[1]
+	quiz_option_c.text = options[2]
+	quiz_option_d.text = options[3]
+	
+	# Adjust button heights for long text
+	adjust_all_button_heights()
+	
+	# Store correct answer for validation
+	correct_answer_index = correct_index
+	
+	# Enable quiz buttons
+	enable_quiz_buttons()
+	
+	print("✅ Quiz JSON exibido com sucesso!")
+	print("🎯 Pergunta: ", question_text)
+	print("🎯 Resposta correta: ", correct_letter)
 
 func cache_npc_data(npc):
 	if not npc or not is_instance_valid(npc):
