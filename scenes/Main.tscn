@@ -59,9 +59,9 @@ corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="QuizButtonHoverStyle"]
 content_margin_left = 20.0
-content_margin_top = 15.0
+content_margin_top = 20.0
 content_margin_right = 20.0
-content_margin_bottom = 15.0
+content_margin_bottom = 20.0
 bg_color = Color(0.3, 0.4, 0.6, 0.95)
 border_width_left = 2
 border_width_top = 2
@@ -75,9 +75,9 @@ corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="QuizButtonStyle"]
 content_margin_left = 20.0
-content_margin_top = 15.0
+content_margin_top = 20.0
 content_margin_right = 20.0
-content_margin_bottom = 15.0
+content_margin_bottom = 20.0
 bg_color = Color(0.2, 0.3, 0.5, 0.9)
 border_width_left = 2
 border_width_top = 2
@@ -289,11 +289,12 @@ horizontal_alignment = 1
 vertical_alignment = 1
 
 [node name="OptionsContainer" type="VBoxContainer" parent="UI/QuizDialog/VBoxContainer"]
-custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
+size_flags_vertical = 3
 theme_override_constants/separation = 20
 
 [node name="OptionA" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+clip_contents = true
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
@@ -302,8 +303,11 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "A) Carregando..."
+text_overrun_behavior = 3
+autowrap_mode = 3
 
 [node name="OptionB" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+clip_contents = true
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
@@ -312,8 +316,11 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "B) Carregando..."
+text_overrun_behavior = 3
+autowrap_mode = 3
 
 [node name="OptionC" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+clip_contents = true
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
@@ -322,8 +329,11 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "C) Carregando..."
+text_overrun_behavior = 3
+autowrap_mode = 3
 
 [node name="OptionD" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+clip_contents = true
 custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
@@ -332,3 +342,5 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "D) Carregando..."
+text_overrun_behavior = 3
+autowrap_mode = 3

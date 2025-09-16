@@ -30,6 +30,7 @@ var awaiting_question = false # Flag to know if we're generating a question
 var npc_attempt_counts = {} # Track how many attempts each NPC has had
 var cached_npc_data = {} # Cache NPC data to prevent null access
 var last_detected_npc = null # Store last detected NPC as backup
+var npc_used_topics = {} # Track used topics per NPC to avoid repetition
 var current_npc_name = "" # Store current NPC name for persistence
 var current_npc_subject = "" # Store current NPC subject for persistence
 
@@ -309,10 +310,79 @@ func open_traditional_chat(chat_npc):
 	generate_question_for_npc(chat_npc)
 	chat_input.grab_focus()
 
+func get_topic_variety_prompt(npc_name: String, subject: String, attempt_count: int) -> String:
+	# Initialize used topics for this NPC if not exists
+	if not npc_used_topics.has(npc_name):
+		npc_used_topics[npc_name] = []
+	
+	var used_topics = npc_used_topics[npc_name]
+	var variety_prompt = ""
+	
+	if attempt_count == 0:
+		variety_prompt = "PRIMEIRA PERGUNTA: Escolha um tópico interessante e envolvente. "
+	else:
+		variety_prompt = "PERGUNTA " + str(attempt_count + 1) + ": OBRIGATÓRIO usar tópico DIFERENTE das anteriores. "
+		
+		# Add specific avoidance based on subject
+		match subject:
+			"Português":
+				if used_topics.has("virgula"):
+					variety_prompt += "NÃO faça sobre vírgula novamente. "
+				if used_topics.has("verbo"):
+					variety_prompt += "NÃO faça sobre verbos novamente. "
+				variety_prompt += "Varie entre: interpretação de texto, classes gramaticais, ortografia, literatura, produção textual. "
+			"Ciências":
+				variety_prompt += "Varie entre: corpo humano, meio ambiente, matéria e energia, terra e universo, seres vivos. "
+			"Geografia":
+				variety_prompt += "Varie entre: relevo, clima, hidrografia, população, economia, cartografia. "
+			"História":
+				variety_prompt += "Varie entre: Brasil colonial, povos indígenas, cultura, períodos históricos, personagens. "
+			"Matemática":
+				variety_prompt += "Varie entre: operações, geometria, frações, medidas, problemas práticos. "
+	
+	variety_prompt += "Seja CRIATIVO e use exemplos do cotidiano. "
+	return variety_prompt
+
 func update_attempt_counter(npc_name: String):
 	var current_attempts = npc_attempt_counts.get(npc_name, 0)
 	var attempt_number = current_attempts + 1
 	quiz_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
+
+func adjust_button_height(button: Button) -> void:
+	# Wait for the text to be set and rendered
+	await get_tree().process_frame
+	
+	# Calculate required height based on text content
+	var font = button.get_theme_font("font")
+	var font_size = button.get_theme_font_size("font_size")
+	
+	if font and font_size > 0:
+		# Get button width minus margins
+		var available_width = button.size.x - 40 # 20px margin on each side
+		if available_width <= 0:
+			available_width = 800 # Fallback width
+		
+		# Calculate text dimensions
+		var text_size = font.get_multiline_string_size(
+			button.text,
+			HORIZONTAL_ALIGNMENT_LEFT,
+			available_width,
+			font_size
+		)
+		
+		# Calculate required height (text height + padding)
+		var required_height = max(80, text_size.y + 30) # Minimum 80px, +30px padding
+		
+		# Apply new height
+		button.custom_minimum_size.y = required_height
+		
+		print("📏 Button '", button.text.substr(0, 20), "...' height adjusted to: ", required_height)
+
+func adjust_all_button_heights():
+	adjust_button_height(quiz_option_a)
+	adjust_button_height(quiz_option_b)
+	adjust_button_height(quiz_option_c)
+	adjust_button_height(quiz_option_d)
 
 func show_wrong_answer_animation():
 	quiz_wrong_animation.visible = true
@@ -772,6 +842,9 @@ func parse_and_display_quiz_json(quiz_data: Dictionary):
 		quiz_option_c.text = options[2]
 		quiz_option_d.text = options[3]
 		
+		# Adjust button heights for long text
+		adjust_all_button_heights()
+		
 		# Store correct answer for validation
 		correct_answer_index = correct_index
 		
@@ -863,8 +936,9 @@ func create_quiz_prompt(npc) -> String:
 	base_prompt += "IMPORTANTE: Gere UMA pergunta de múltipla escolha com 4 alternativas sobre " + npc_subject + ". "
 	base_prompt += "A pergunta deve ser específica e as alternativas devem estar relacionadas à pergunta. "
 	
-	if attempt_count > 0:
-		base_prompt += "Nova pergunta de múltipla escolha, tópico diferente. "
+	# Add topic variety system
+	var topic_variety_prompt = get_topic_variety_prompt(npc_name, npc_subject, attempt_count)
+	base_prompt += topic_variety_prompt
 	
 	match npc_subject:
 		"Geografia":
@@ -874,12 +948,14 @@ func create_quiz_prompt(npc) -> String:
 			base_prompt += "💼 MUNDO DO TRABALHO: Transformação das paisagens naturais e antrópicas; diferentes tipos de trabalho no campo e na cidade; "
 			base_prompt += "🗺️ FORMAS DE REPRESENTAÇÃO: Fenômenos naturais e sociais representados de diferentes maneiras; leitura de mapas; escalas cartográficas. "
 		"Português":
-			base_prompt += "BNCC 6º ano LÍNGUA PORTUGUESA - COMPETÊNCIAS:\n"
-			base_prompt += "📖 LEITURA: Compreensão de textos narrativos, descritivos e informativos; inferências e relações entre informações; "
-			base_prompt += "✍️ ESCRITA: Produção de textos narrativos e descritivos; uso adequado da pontuação e ortografia; "
-			base_prompt += "🗣️ ORALIDADE: Apresentação de ideias com clareza; participação em discussões; "
-			base_prompt += "🔍 ANÁLISE LINGUÍSTICA: Classes de palavras (substantivo, adjetivo, verbo); concordância nominal e verbal; "
-			base_prompt += "📚 LITERATURA: Contos, fábulas e poemas; elementos narrativos (personagem, tempo, espaço). "
+			base_prompt += "BNCC 6º ano LÍNGUA PORTUGUESA - TÓPICOS VARIADOS:\n"
+			base_prompt += "📖 LEITURA E INTERPRETAÇÃO: Textos narrativos (contos, fábulas), textos informativos, inferências, tema central, personagens, tempo e espaço; "
+			base_prompt += "🔤 ORTOGRAFIA E ACENTUAÇÃO: Palavras com dificuldades ortográficas, acentuação de oxítonas, paroxítonas e proparoxítonas, uso de hífen; "
+			base_prompt += "📝 PONTUAÇÃO: Vírgula em enumerações, ponto final, exclamação, interrogação, dois pontos, aspas; "
+			base_prompt += "🏷️ CLASSES GRAMATICAIS: Substantivos (próprios, comuns, coletivos), adjetivos, verbos (tempos presente, passado, futuro), artigos, pronomes; "
+			base_prompt += "🔗 SINTAXE: Sujeito e predicado, concordância nominal básica, formação de frases; "
+			base_prompt += "📚 LITERATURA: Elementos da narrativa, diferença entre prosa e verso, rimas, figuras de linguagem simples (metáfora, comparação); "
+			base_prompt += "✍️ PRODUÇÃO TEXTUAL: Estrutura de parágrafos, coesão textual, tipos de texto (narrativo, descritivo, instrucional). "
 		"Ciências":
 			base_prompt += "BNCC 6º ano CIÊNCIAS DA NATUREZA - UNIDADES TEMÁTICAS:\n"
 			base_prompt += "🔬 MATÉRIA E ENERGIA: Estados físicos da matéria e transformações; misturas e separação de materiais (filtração, decantação, destilação); fontes de energia (renováveis e não renováveis); usos da energia no cotidiano e impactos ambientais; luz, som, calor e eletricidade no dia a dia. "
@@ -1117,6 +1193,9 @@ func parse_and_display_quiz(quiz_content: String):
 	quiz_option_c.text = "C) " + new_options[2]
 	quiz_option_d.text = "D) " + new_options[3]
 	
+	# Adjust button heights for long text
+	adjust_all_button_heights()
+	
 	# Enable buttons
 	enable_quiz_buttons()
 
@@ -1149,12 +1228,14 @@ func create_question_prompt(npc) -> String:
 			base_prompt += "💼 MUNDO DO TRABALHO: Transformação das paisagens naturais e antrópicas; diferentes tipos de trabalho no campo e na cidade; "
 			base_prompt += "🗺️ FORMAS DE REPRESENTAÇÃO: Fenômenos naturais e sociais representados de diferentes maneiras; leitura de mapas; escalas cartográficas. "
 		"Português":
-			base_prompt += "BNCC 6º ano LÍNGUA PORTUGUESA - COMPETÊNCIAS:\n"
-			base_prompt += "📖 LEITURA: Compreensão de textos narrativos, descritivos e informativos; inferências e relações entre informações; "
-			base_prompt += "✍️ ESCRITA: Produção de textos narrativos e descritivos; uso adequado da pontuação e ortografia; "
-			base_prompt += "🗣️ ORALIDADE: Apresentação de ideias com clareza; participação em discussões; "
-			base_prompt += "🔍 ANÁLISE LINGUÍSTICA: Classes de palavras (substantivo, adjetivo, verbo); concordância nominal e verbal; "
-			base_prompt += "📚 LITERATURA: Contos, fábulas e poemas; elementos narrativos (personagem, tempo, espaço). "
+			base_prompt += "BNCC 6º ano LÍNGUA PORTUGUESA - TÓPICOS VARIADOS:\n"
+			base_prompt += "📖 LEITURA E INTERPRETAÇÃO: Textos narrativos (contos, fábulas), textos informativos, inferências, tema central, personagens, tempo e espaço; "
+			base_prompt += "🔤 ORTOGRAFIA E ACENTUAÇÃO: Palavras com dificuldades ortográficas, acentuação de oxítonas, paroxítonas e proparoxítonas, uso de hífen; "
+			base_prompt += "📝 PONTUAÇÃO: Vírgula em enumerações, ponto final, exclamação, interrogação, dois pontos, aspas; "
+			base_prompt += "🏷️ CLASSES GRAMATICAIS: Substantivos (próprios, comuns, coletivos), adjetivos, verbos (tempos presente, passado, futuro), artigos, pronomes; "
+			base_prompt += "🔗 SINTAXE: Sujeito e predicado, concordância nominal básica, formação de frases; "
+			base_prompt += "📚 LITERATURA: Elementos da narrativa, diferença entre prosa e verso, rimas, figuras de linguagem simples (metáfora, comparação); "
+			base_prompt += "✍️ PRODUÇÃO TEXTUAL: Estrutura de parágrafos, coesão textual, tipos de texto (narrativo, descritivo, instrucional). "
 		"Ciências":
 			base_prompt += "BNCC 6º ano CIÊNCIAS DA NATUREZA - UNIDADES TEMÁTICAS:\n"
 			base_prompt += "🔬 MATÉRIA E ENERGIA: Estados físicos da matéria e transformações; misturas e separação de materiais (filtração, decantação, destilação); fontes de energia (renováveis e não renováveis); usos da energia no cotidiano e impactos ambientais; luz, som, calor e eletricidade no dia a dia. "

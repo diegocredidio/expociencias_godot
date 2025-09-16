@@ -100,11 +100,21 @@ Deno.serve(async (req) => {
     if (quiz_mode === "multipla_escolha") {
       fullPrompt = `${prompt}
 
-Crie UMA pergunta de múltipla escolha sobre ${subject} adequada para alunos do 6º ano do ensino fundamental.
+MISSÃO: Crie uma pergunta de múltipla escolha CRIATIVA e VARIADA sobre ${subject} para 6º ano.
+
+DIRETRIZES DE CRIATIVIDADE:
+- EVITE perguntas básicas como "O que é..." ou "Qual a definição de..."
+- Use contextos práticos, situações do cotidiano, exemplos concretos
+- Varie entre: aplicação prática, análise, comparação, interpretação
+- Para Português: use textos curtos, situações reais, análise de frases
+- Para Ciências: experimentos, fenômenos naturais, corpo humano
+- Para Geografia: lugares reais, mapas, clima, paisagens
+- Para História: personagens, eventos, causas e consequências
+- Para Matemática: problemas práticos, situações do dia a dia
 
 FORMATO OBRIGATÓRIO (JSON):
 {
-  "question": "Sua pergunta aqui?",
+  "question": "Sua pergunta criativa aqui?",
   "options": [
     "A) Primeira opção",
     "B) Segunda opção", 
@@ -112,14 +122,15 @@ FORMATO OBRIGATÓRIO (JSON):
     "D) Quarta opção"
   ],
   "correct_answer": 0,
-  "explanation": "Breve explicação da resposta correta"
+  "explanation": "Explicação clara e didática"
 }
 
-REGRAS:
-- Pergunta educativa e apropriada para 6º ano
-- 4 opções claras (A, B, C, D)
-- correct_answer deve ser 0, 1, 2 ou 3
-- Explicação simples e didática
+VALIDAÇÃO OBRIGATÓRIA:
+- Pergunta deve ser interessante e envolvente
+- 4 alternativas plausíveis (evite opções óbvias)
+- Uma única resposta correta
+- Explicação educativa e motivadora
+- Linguagem adequada para 11-12 anos
 - Retorne APENAS o JSON válido`;
     } else if (quiz_mode === "pergunta_aberta") {
       fullPrompt = `${prompt}
@@ -156,15 +167,15 @@ Seja claro, educativo e motivador. Use linguagem simples e exemplos práticos.`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-3.5-turbo',
+        model: 'gpt-4o-mini',
         messages: [
           {
             role: 'user',
             content: fullPrompt
           }
         ],
-        max_tokens: 500,
-        temperature: 0.7,
+        max_tokens: 800,
+        temperature: 0.9,
       }),
     });
 
