@@ -20,6 +20,9 @@ extends Node3D
 @onready var quiz_option_c = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionC
 @onready var quiz_option_d = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionD
 
+# AI Question Builder
+var ai_question_builder: AIQuestionBuilder
+
 var current_npc = null
 var game_state = {}
 # URL do proxy Supabase (substitua pela sua URL)
@@ -103,6 +106,13 @@ func call_supabase_proxy(prompt: String, subject: String = "Educação", quiz_mo
 		return ""
 
 func _ready():
+	# Inicializar AI Question Builder
+	ai_question_builder = AIQuestionBuilder.new()
+	add_child(ai_question_builder)
+	ai_question_builder.quiz_ready.connect(_on_quiz_ready)
+	ai_question_builder.generation_failed.connect(_on_quiz_generation_failed)
+	print("🤖 AIQuestionBuilder inicializado")
+	
 	# Adicionar ao grupo main para portas se registrarem
 	add_to_group("main")
 	print("🚪 Main.gd adicionado ao grupo 'main'")
@@ -511,6 +521,11 @@ func _on_quiz_option_selected(option_index: int):
 		# Correct answer
 		print("🎉 RESPOSTA CORRETA! Iniciando desbloqueio...")
 		quiz_question.text += "\n\n[color=green][b]🎉 PARABÉNS! Resposta correta![/b][/color]"
+		
+		# Mostrar explicação se disponível
+		if current_quiz_data.has("rationale") and current_quiz_data.rationale != "":
+			quiz_question.text += "\n\n[color=lightblue][b]💡 Explicação:[/b] " + current_quiz_data.rationale + "[/color]"
+		
 		quiz_question.text += "\n[color=gold][b]🎉 PORTA DESBLOQUEADA![/b][/color]"
 		quiz_question.text += "\n[color=cyan][b]🚪 A porta está se abrindo...[/b][/color]"
 		
@@ -543,6 +558,10 @@ func _on_quiz_option_selected(option_index: int):
 		quiz_question.text += "\n\n[color=red][b]Resposta incorreta![/b][/color]"
 		quiz_question.text += "\n[color=#00f6ff]A resposta correta era: " + get_correct_option_text() + "[/color]"
 		
+		# Mostrar explicação se disponível
+		if current_quiz_data.has("rationale") and current_quiz_data.rationale != "":
+			quiz_question.text += "\n\n[color=lightblue][b]💡 Explicação:[/b] " + current_quiz_data.rationale + "[/color]"
+		
 		if current_attempts >= 3:
 			quiz_question.text += "\n[color=red][b]📝 Você já tentou 3 vezes.[/b][/color]"
 			quiz_question.text += "\n[color=yellow][b]💡 Sugestão: Estude mais sobre " + current_npc_subject + " e volte depois![/b][/color]"
@@ -555,9 +574,8 @@ func _on_quiz_option_selected(option_index: int):
 				generate_quiz_question_for_npc(null)
 
 func get_correct_option_text() -> String:
-	var options = ["A", "B", "C", "D"]
 	var button_texts = [quiz_option_a.text, quiz_option_b.text, quiz_option_c.text, quiz_option_d.text]
-	return options[correct_answer_index] + ") " + button_texts[correct_answer_index].substr(3)
+	return button_texts[correct_answer_index]
 
 func _on_send_button_pressed():
 	send_message()
@@ -777,64 +795,69 @@ func generate_quiz_question_for_npc(npc):
 	for node in existing_http:
 		node.queue_free()
 	
-	# Create request for quiz question generation
-	var http_request = HTTPRequest.new()
-	http_request.name = "Quiz_Request"
-	add_child(http_request)
-	http_request.timeout = 15.0
+	# Mostrar loading state
+	quiz_question.text = "🤖 Gerando pergunta inteligente..."
+	reset_quiz_buttons()
 	
-	# Connect signal
-	print("🔗 Conectando sinal request_completed para quiz")
-	http_request.request_completed.connect(_on_quiz_question_generated)
-	print("🔗 Sinal conectado para: ", http_request.name)
+	# Obter prompt de variedade de tópicos
+	var attempt_count = npc_attempt_counts.get(current_npc_name, 0)
+	var topic_variety_prompt = get_topic_variety_prompt(current_npc_name, current_npc_subject, attempt_count)
 	
-	# Criar prompt simplificado para o proxy
-	var simplified_prompt = "Crie uma pergunta de múltipla escolha sobre " + current_npc_subject + " para alunos do 6º ano do ensino fundamental."
-	simplified_prompt += " A pergunta deve ter 4 alternativas e ser apropriada para a idade."
-	simplified_prompt += " Professor: " + current_npc_name
+	# Usar o novo sistema AIQuestionBuilder
+	ai_question_builder.request_question(
+		current_npc_name,
+		current_npc_subject,
+		topic_variety_prompt,
+		attempt_count,
+		supabase_proxy_url,
+		SupabaseConfig.ANON_KEY
+	)
+
+func _on_quiz_ready(quiz_item: Dictionary):
+	print("🎉 Quiz gerado com sucesso pelo AIQuestionBuilder!")
+	awaiting_question = false
 	
-	print("🌐 Enviando requisição de quiz para proxy Supabase...")
+	# Exibir pergunta
+	quiz_question.text = quiz_item.question
 	
-	var response = await call_supabase_proxy(simplified_prompt, current_npc_subject, "multipla_escolha")
+	# Exibir alternativas (sem prefixos A) B) C) D))
+	quiz_option_a.text = quiz_item.options.A
+	quiz_option_b.text = quiz_item.options.B
+	quiz_option_c.text = quiz_item.options.C
+	quiz_option_d.text = quiz_item.options.D
 	
-	if response == "":
-		print("❌ Falha ao receber resposta do proxy")
-		quiz_question.text = "❌ Erro: Falha ao gerar pergunta de múltipla escolha"
-		awaiting_question = false
-		http_request.queue_free()
-	else:
-		print("✅ Resposta de quiz recebida do proxy com sucesso")
-		print("📨 Resposta bruta: ", response.substr(0, 200), "...")
-		
-		# First try to parse as JSON directly (new format)
-		var quiz_json = JSON.parse_string(response)
-		if quiz_json and quiz_json is Dictionary:
-			print("✅ Parsing JSON direto bem-sucedido")
-			parse_and_display_quiz_json(quiz_json)
-		else:
-			# Try to extract JSON from text response (fallback for text format)
-			print("🔄 Tentando extrair JSON do texto...")
-			var json_start = response.find("{")
-			var json_end = response.rfind("}")
-			
-			if json_start != -1 and json_end != -1 and json_end > json_start:
-				var json_text = response.substr(json_start, json_end - json_start + 1)
-				print("📨 JSON extraído: ", json_text.substr(0, 200), "...")
-				
-				var extracted_json = JSON.parse_string(json_text)
-				if extracted_json and extracted_json is Dictionary:
-					print("✅ Parsing JSON extraído bem-sucedido")
-					parse_and_display_quiz_json(extracted_json)
-				else:
-					print("❌ JSON extraído inválido")
-					# Try parsing as text format (old format)
-					parse_and_display_quiz(response)
-			else:
-				print("❌ Nenhum JSON encontrado, tentando parsing como texto")
-				# Fallback to text parsing
-				parse_and_display_quiz(response)
-		
-		http_request.queue_free()
+	# Ajustar altura dos botões para texto longo
+	adjust_all_button_heights()
+	
+	# Armazenar resposta correta para validação
+	match quiz_item.correct:
+		"A": correct_answer_index = 0
+		"B": correct_answer_index = 1
+		"C": correct_answer_index = 2
+		"D": correct_answer_index = 3
+		_: correct_answer_index = 0
+	
+	# Armazenar explicação para mostrar após resposta
+	current_quiz_data["rationale"] = quiz_item.rationale
+	current_quiz_data["topic_hint"] = quiz_item.topic_hint
+	
+	# Habilitar botões
+	enable_quiz_buttons()
+	
+	print("✅ Quiz exibido na interface!")
+	print("🎯 Pergunta: ", quiz_item.question)
+	print("🎯 Resposta correta: ", quiz_item.correct)
+	print("🎯 Explicação: ", quiz_item.rationale)
+
+func _on_quiz_generation_failed(reason: String):
+	print("❌ Falha na geração do quiz: ", reason)
+	awaiting_question = false
+	
+	# Mostrar mensagem de fallback
+	quiz_question.text = "❌ Não foi possível gerar a questão, tente novamente.\n\nMotivo: " + reason
+	
+	# Resetar botões
+	reset_quiz_buttons()
 
 func parse_and_display_quiz_json(quiz_data: Dictionary):
 	print("🔍 === PARSING QUIZ JSON ===")
