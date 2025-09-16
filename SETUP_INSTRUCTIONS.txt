@@ -1,0 +1,35 @@
+JOGO EDUCATIVO DE DUNGEON - INSTRUÇÕES DE CONFIGURAÇÃO
+=====================================================
+
+Este jogo foi criado usando Godot 4.3 e integra OpenAI para conversas educativas sobre temas do 6º ano do Brasil.
+
+CONFIGURAÇÃO INICIAL:
+1. Abra o projeto no Godot 4.3
+2. Para usar OpenAI, crie um arquivo em user://openai_key.txt com sua chave da API OpenAI
+3. Execute o jogo pressionando F5
+
+COMO JOGAR:
+- Use WASD ou setas para mover o personagem
+- Pressione E ou Espaço para interagir com NPCs quando aparecer o prompt
+- Responda às perguntas educativas para desbloquear novas salas
+
+ESTRUTURA DO JOGO:
+- Sala Inicial: Professor Silva (Geografia) - "Qual é a maior região do Brasil?"
+- Sala de Biologia: Professora Santos - "Quais são os cinco reinos dos seres vivos?"  
+- Sala de Ciências: Professor Costa - "Quantos planetas existem no sistema solar?"
+- Sala Final: Diretor Oliveira - Revisão geral
+
+TEMAS EDUCATIVOS COBERTOS:
+- Geografia do Brasil (regiões, fronteiras)
+- Biologia (reinos dos seres vivos, classificação)
+- Ciências (sistema solar, astronomia)
+
+RECURSOS UTILIZADOS:
+- Modular Dungeon Kit da Kenney para cenários 3D
+- Sistema de chat integrado com OpenAI
+- Progressão baseada em respostas corretas
+- Interface educativa apropriada para 6º ano
+
+Para modificar os NPCs ou adicionar novos, edite os arquivos na pasta scenes/ e scripts/.
+
+NOTA: Sem a chave da OpenAI, o jogo ainda funcionará mas as conversas serão limitadas.

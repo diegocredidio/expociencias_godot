@@ -1,0 +1,35 @@
+# Godot 4+ specific ignores
+.godot/
+
+# API Keys and Secrets - NEVER COMMIT
+openai_key.txt
+openai_key.txt.example
+*.key
+*_key.txt
+*_api_key.txt
+sk-proj-*
+sk-*
+
+# Environment variables and secrets
+.env
+.env.local
+*.secret
+*_secret.txt
+config.json
+secrets.json
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Build artifacts
+*.exe
+*.pck
+*.tmp

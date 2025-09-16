@@ -1,0 +1,38 @@
+[gd_resource type="Theme" load_steps=6 format=3]
+
+[ext_resource type="FontFile" uid="uid://byfuw8eqkxceu" path="res://fonts/Barlow-Regular.ttf" id="1_regular"]
+[ext_resource type="FontFile" uid="uid://c5i0yk5y0p2fq" path="res://fonts/Barlow-Bold.ttf" id="2_bold"]
+[ext_resource type="FontFile" uid="uid://cfw5y8qsuj5el" path="res://fonts/Barlow-Medium.ttf" id="3_medium"]
+[ext_resource type="FontFile" uid="uid://b7qh2x7rjg5k4" path="res://fonts/Barlow-SemiBold.ttf" id="4_semibold"]
+[ext_resource type="FontFile" uid="uid://dt1fxqn0uyvsw" path="res://fonts/Barlow-Light.ttf" id="5_light"]
+
+[resource]
+default_font = ExtResource("1_regular")
+default_font_size = 16
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1"]
+bg_color = Color(0.2, 0.25, 0.35, 0.9)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+# Define font variations for different UI elements
+Button/fonts/font = ExtResource("3_medium")
+Button/font_sizes/font_size = 14
+
+Label/fonts/font = ExtResource("1_regular")
+Label/font_sizes/font_size = 16
+
+RichTextLabel/fonts/normal_font = ExtResource("1_regular")
+RichTextLabel/fonts/bold_font = ExtResource("2_bold")
+RichTextLabel/font_sizes/normal_font_size = 16
+
+LineEdit/fonts/font = ExtResource("1_regular")
+LineEdit/font_sizes/font_size = 14
+
+# Dialog specific styling
+AcceptDialog/styles/panel = SubResource("StyleBoxFlat_1")
+
+# Custom font sizes for headings
+Label/font_sizes/font_size = 16

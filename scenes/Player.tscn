@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://cj8w5d1hbp0no"]
+
+[ext_resource type="Script" uid="uid://ejw5o5dwijgc" path="res://scripts/Player.gd" id="1_brnxu"]
+[ext_resource type="PackedScene" uid="uid://d1ax6non6i8ms" path="res://kenney_mini-characters/Models/GLB format/character-male-f.glb" id="2_character"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_1htyy"]
+radius = 0.3
+height = 1.8
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_interaction"]
+radius = 2.0
+
+[node name="Player" type="CharacterBody3D"]
+script = ExtResource("1_brnxu")
+
+[node name="CharacterModel" parent="." instance=ExtResource("2_character")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_1htyy")
+
+[node name="InteractionArea" type="Area3D" parent="."]
+
+[node name="InteractionCollision" type="CollisionShape3D" parent="InteractionArea"]
+shape = SubResource("SphereShape3D_interaction")
+
+[node name="CameraFollow" type="Camera3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.866025, 0.5, -0.707107, -0.5, 0.612372, 0, 8, 8)
+projection = 1
+size = 15.0

@@ -1,0 +1,219 @@
+[gd_scene load_steps=10 format=3 uid="uid://bo8uyc0lpjlpj"]
+
+[ext_resource type="Script" uid="uid://dty27ima3k8sw" path="res://scripts/Main.gd" id="1_5qnwj"]
+[ext_resource type="PackedScene" uid="uid://cj8w5d1hbp0no" path="res://scenes/Player.tscn" id="2_8vhkm"]
+[ext_resource type="PackedScene" uid="uid://c4k5pqrhag5nd" path="res://scenes/DungeonLevel.tscn" id="3_h3xp4"]
+[ext_resource type="FontFile" uid="uid://rd0w2y1t1a5k" path="res://fonts/Barlow-Regular.ttf" id="4_barlow_regular"]
+[ext_resource type="FontFile" uid="uid://dd3b57u6b4kqw" path="res://fonts/Barlow-Bold.ttf" id="5_barlow_bold"]
+[ext_resource type="FontFile" uid="uid://cptljk3p3f3a2" path="res://fonts/Barlow-SemiBold.ttf" id="6_barlow_semibold"]
+[ext_resource type="Texture2D" uid="uid://cyh5t3mxf887f" path="res://ui/icons/send.svg" id="7_nxtc6"]
+
+[sub_resource type="StyleBoxFlat" id="ChatDialogStyle"]
+bg_color = Color(0, 0.00392157, 0.0392157, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.23, 0.29, 0.36, 1)
+corner_radius_top_left = 16
+corner_radius_top_right = 16
+corner_radius_bottom_right = 16
+corner_radius_bottom_left = 16
+shadow_color = Color(0, 0, 0, 0.5)
+shadow_size = 8
+
+[sub_resource type="StyleBoxFlat" id="ChatHistoryStyle"]
+bg_color = Color(0.05, 0.07, 0.1, 0.9)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.19, 0.21, 0.24, 0.8)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[node name="Main" type="Node3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.451453, 0)
+script = ExtResource("1_5qnwj")
+
+[node name="DungeonLevel" parent="." instance=ExtResource("3_h3xp4")]
+
+[node name="Player" parent="." instance=ExtResource("2_8vhkm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.59, 0, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)
+light_energy = 0.8
+shadow_enabled = true
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="InteractionPrompt" type="Label" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -75.0
+offset_right = 200.0
+offset_bottom = -25.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_fonts/font = ExtResource("6_barlow_semibold")
+theme_override_font_sizes/font_size = 48
+text = "Pressione C para conversar"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ChatDialog" type="Panel" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("ChatDialogStyle")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ChatDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NPCName" type="Label" parent="UI/ChatDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 24
+text = "Professor Silva"
+horizontal_alignment = 1
+
+[node name="ChatHistory" type="RichTextLabel" parent="UI/ChatDialog/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
+theme_override_fonts/bold_font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/normal_font_size = 40
+theme_override_styles/normal = SubResource("ChatHistoryStyle")
+bbcode_enabled = true
+text = "Welcome to the dungeon! I'm here to teach you about Brazilian geography, biology, and science."
+
+[node name="InputContainer" type="HBoxContainer" parent="UI/ChatDialog/VBoxContainer"]
+layout_mode = 2
+
+[node name="ChatInput" type="LineEdit" parent="UI/ChatDialog/VBoxContainer/InputContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/font_size = 48
+placeholder_text = "Digite sua resposta ou pergunta..."
+
+[node name="SendButton" type="Button" parent="UI/ChatDialog/VBoxContainer/InputContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_barlow_semibold")
+theme_override_font_sizes/font_size = 48
+text = "Enviar"
+icon = ExtResource("7_nxtc6")
+icon_alignment = 2
+
+[node name="CloseButton" type="Button" parent="UI/ChatDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_barlow_semibold")
+theme_override_font_sizes/font_size = 48
+text = "Fechar"
+
+[node name="QuizDialog" type="Panel" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.1
+anchor_top = 0.1
+anchor_right = 0.9
+anchor_bottom = 0.9
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("ChatDialogStyle")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/QuizDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="QuizNPCName" type="Label" parent="UI/QuizDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 24
+text = "Professor Silva - Quiz"
+horizontal_alignment = 1
+
+[node name="QuizQuestion" type="RichTextLabel" parent="UI/QuizDialog/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.9, 0.92, 0.95, 1)
+theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
+theme_override_fonts/bold_font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/normal_font_size = 40
+theme_override_styles/normal = SubResource("ChatHistoryStyle")
+bbcode_enabled = true
+text = "Preparando pergunta de múltipla escolha..."
+
+[node name="OptionsContainer" type="VBoxContainer" parent="UI/QuizDialog/VBoxContainer"]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+
+[node name="OptionA" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/font_size = 32
+text = "A) Carregando..."
+
+[node name="OptionB" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/font_size = 32
+text = "B) Carregando..."
+
+[node name="OptionC" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/font_size = 32
+text = "C) Carregando..."
+
+[node name="OptionD" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/font_size = 32
+text = "D) Carregando..."
+
+[node name="QuizCloseButton" type="Button" parent="UI/QuizDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_barlow_semibold")
+theme_override_font_sizes/font_size = 48
+text = "Fechar Quiz"
