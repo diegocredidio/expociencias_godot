@@ -12,6 +12,7 @@ extends Node3D
 @onready var dungeon_level = $DungeonLevel
 @onready var quiz_dialog = $UI/QuizDialog
 @onready var quiz_question = $UI/QuizDialog/VBoxContainer/QuizQuestion
+@onready var quiz_professor_name = $UI/QuizDialog/VBoxContainer/HeaderContainer/ProfessorName
 @onready var quiz_close_button = $UI/QuizDialog/VBoxContainer/HeaderContainer/CloseButton
 @onready var quiz_attempt_count = $UI/QuizDialog/VBoxContainer/HeaderContainer/AttemptCount
 @onready var quiz_wrong_animation = $UI/QuizDialog/VBoxContainer/WrongAnswerAnimation
@@ -373,6 +374,10 @@ func update_attempt_counter(npc_name: String):
 	var attempt_number = current_attempts + 1
 	quiz_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
 
+func update_professor_info(npc_name: String, npc_subject: String):
+	# Atualizar nome do professor com disciplina
+	quiz_professor_name.text = npc_name + " - " + npc_subject
+
 func adjust_button_height(button: Button) -> void:
 	# Wait for the text to be set and rendered
 	await get_tree().process_frame
@@ -426,6 +431,9 @@ func show_wrong_answer_animation():
 func open_quiz_interface(chat_npc):
 	quiz_dialog.visible = true
 	chat_dialog.visible = false
+	
+	# Atualizar informações do professor
+	update_professor_info(chat_npc.npc_name, chat_npc.subject)
 	
 	# Verificar se é o diretor (pergunta aberta)
 	var is_director = chat_npc.npc_name == "Diretor Oliveira"

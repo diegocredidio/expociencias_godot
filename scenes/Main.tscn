@@ -237,8 +237,8 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_colors/font_color = Color(0.322, 0.592, 0.875, 1)
 theme_override_fonts/font = ExtResource("5_barlow_bold")
-theme_override_font_sizes/font_size = 48
-text = "Prof. Costa"
+theme_override_font_sizes/font_size = 36
+text = "Professor - Disciplina"
 
 [node name="Spacer" type="Control" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
 layout_mode = 2
