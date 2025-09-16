@@ -860,7 +860,7 @@ func create_quiz_prompt(npc) -> String:
 	var attempt_count = npc_attempt_counts.get(npc_name, 0)
 	
 	var base_prompt = "Professor(a) " + npc_name + " de " + npc_subject + " (6º ano). "
-	base_prompt += "IMPORTANTE: Gere UMA pergunta de múltipla escolha com 4 alternativas (A, B, C, D) sobre " + npc_subject + ". "
+	base_prompt += "IMPORTANTE: Gere UMA pergunta de múltipla escolha com 4 alternativas sobre " + npc_subject + ". "
 	base_prompt += "A pergunta deve ser específica e as alternativas devem estar relacionadas à pergunta. "
 	
 	if attempt_count > 0:
