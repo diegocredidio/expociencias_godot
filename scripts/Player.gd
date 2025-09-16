@@ -8,7 +8,7 @@ signal interact_requested
 @export var jump_velocity = 8.0
 @export var acceleration = 15.0
 @export var friction = 40.0
-@export var initial_y_position: float = 0 # Posição Y inicial do player
+@export var initial_y_position: float = 0.1 # Posição Y inicial do player
 
 @onready var interaction_area = $InteractionArea
 @onready var character_model = $CharacterModel

@@ -11,16 +11,17 @@ height = 1.8
 radius = 2.0
 
 [node name="Player" type="CharacterBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.522229, 0)
 script = ExtResource("1_brnxu")
 
 [node name="CharacterModel" parent="." instance=ExtResource("2_character")]
 transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.826309, 0)
 shape = SubResource("CapsuleShape3D_1htyy")
 
 [node name="InteractionArea" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.465041, 0)
 
 [node name="InteractionCollision" type="CollisionShape3D" parent="InteractionArea"]
 shape = SubResource("SphereShape3D_interaction")
