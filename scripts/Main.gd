@@ -12,8 +12,7 @@ extends Node3D
 @onready var dungeon_level = $DungeonLevel
 @onready var quiz_dialog = $UI/QuizDialog
 @onready var quiz_question = $UI/QuizDialog/VBoxContainer/QuizQuestion
-@onready var quiz_npc_name = $UI/QuizDialog/VBoxContainer/QuizNPCName
-@onready var quiz_close_button = $UI/QuizDialog/VBoxContainer/QuizCloseButton
+@onready var quiz_close_button = $UI/QuizDialog/VBoxContainer/HeaderContainer/CloseButton
 @onready var quiz_option_a = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionA
 @onready var quiz_option_b = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionB
 @onready var quiz_option_c = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionC
@@ -311,7 +310,6 @@ func open_traditional_chat(chat_npc):
 func open_quiz_interface(chat_npc):
 	quiz_dialog.visible = true
 	chat_dialog.visible = false
-	quiz_npc_name.text = chat_npc.npc_name
 	
 	# LIMPAR CACHE COMPLETAMENTE para evitar dessincronização
 	clear_quiz_cache()

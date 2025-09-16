@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://bo8uyc0lpjlpj"]
+[gd_scene load_steps=14 format=3 uid="uid://bo8uyc0lpjlpj"]
 
 [ext_resource type="Script" uid="uid://dty27ima3k8sw" path="res://scripts/Main.gd" id="1_5qnwj"]
 [ext_resource type="PackedScene" uid="uid://cj8w5d1hbp0no" path="res://scenes/Player.tscn" id="2_8vhkm"]
@@ -26,6 +26,10 @@ shadow_color = Color(0, 0, 0, 0.7)
 shadow_size = 12
 
 [sub_resource type="StyleBoxFlat" id="ChatHistoryStyle"]
+content_margin_left = 20.0
+content_margin_top = 20.0
+content_margin_right = 20.0
+content_margin_bottom = 20.0
 bg_color = Color(0.15, 0.2, 0.3, 0.9)
 border_width_left = 2
 border_width_top = 2
@@ -36,6 +40,18 @@ corner_radius_top_left = 12
 corner_radius_top_right = 12
 corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
+
+[sub_resource type="StyleBoxFlat" id="CloseButtonStyle"]
+bg_color = Color(0.1, 0.1, 0.1, 0.8)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.4, 0.8, 1, 1)
+corner_radius_top_left = 5
+corner_radius_top_right = 5
+corner_radius_bottom_right = 5
+corner_radius_bottom_left = 5
 
 [sub_resource type="StyleBoxFlat" id="QuizButtonHoverStyle"]
 content_margin_left = 20.0
@@ -82,7 +98,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.754, -0.221, -26.897)
 shape = SubResource("BoxShape3D_nxtc6")
 
 [node name="Player" parent="." instance=ExtResource("2_8vhkm")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.59, 1, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.59, 0.0805475, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)
@@ -208,12 +224,42 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 20
 
-[node name="QuizNPCName" type="Label" parent="UI/QuizDialog/VBoxContainer"]
+[node name="HeaderContainer" type="HBoxContainer" parent="UI/QuizDialog/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ProfessorName" type="Label" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.322, 0.592, 0.875, 1)
 theme_override_fonts/font = ExtResource("5_barlow_bold")
 theme_override_font_sizes/font_size = 24
-text = "Professor Silva - Quiz"
+text = "Prof. Costa"
+
+[node name="Spacer" type="Control" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="AttemptCount" type="Label" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.965, 1, 1)
+theme_override_fonts/font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/font_size = 20
+text = "Tentativa 1 de 3"
 horizontal_alignment = 1
+
+[node name="Spacer2" type="Control" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
+custom_minimum_size = Vector2(40, 40)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 24
+theme_override_styles/normal = SubResource("CloseButtonStyle")
+text = "×"
 
 [node name="QuizQuestion" type="RichTextLabel" parent="UI/QuizDialog/VBoxContainer"]
 layout_mode = 2
@@ -225,6 +271,8 @@ theme_override_font_sizes/normal_font_size = 40
 theme_override_styles/normal = SubResource("ChatHistoryStyle")
 bbcode_enabled = true
 text = "Preparando pergunta de múltipla escolha..."
+fit_content = true
+scroll_active = false
 
 [node name="OptionsContainer" type="VBoxContainer" parent="UI/QuizDialog/VBoxContainer"]
 custom_minimum_size = Vector2(0, 400)
@@ -270,9 +318,3 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "D) Carregando..."
-
-[node name="QuizCloseButton" type="Button" parent="UI/QuizDialog/VBoxContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("6_barlow_semibold")
-theme_override_font_sizes/font_size = 48
-text = "Fechar Quiz"

@@ -11,6 +11,7 @@ height = 1.8
 radius = 2.0
 
 [node name="Player" type="CharacterBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.522229, 0)
 script = ExtResource("1_brnxu")
 
 [node name="CharacterModel" parent="." instance=ExtResource("2_character")]
