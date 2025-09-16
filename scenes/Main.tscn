@@ -26,10 +26,10 @@ shadow_color = Color(0, 0, 0, 0.7)
 shadow_size = 12
 
 [sub_resource type="StyleBoxFlat" id="ChatHistoryStyle"]
-content_margin_left = 20.0
-content_margin_top = 20.0
-content_margin_right = 20.0
-content_margin_bottom = 20.0
+content_margin_left = 30.0
+content_margin_top = 40.0
+content_margin_right = 30.0
+content_margin_bottom = 40.0
 bg_color = Color(0.15, 0.2, 0.3, 0.9)
 border_width_left = 2
 border_width_top = 2
@@ -42,16 +42,20 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="CloseButtonStyle"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
 bg_color = Color(0.1, 0.1, 0.1, 0.8)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
 border_color = Color(0.4, 0.8, 1, 1)
-corner_radius_top_left = 5
-corner_radius_top_right = 5
-corner_radius_bottom_right = 5
-corner_radius_bottom_left = 5
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [sub_resource type="StyleBoxFlat" id="QuizButtonHoverStyle"]
 content_margin_left = 20.0
@@ -243,8 +247,8 @@ size_flags_horizontal = 3
 [node name="AttemptCount" type="Label" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0, 0.965, 1, 1)
-theme_override_fonts/font = ExtResource("4_barlow_regular")
-theme_override_font_sizes/font_size = 20
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 28
 text = "Tentativa 1 de 3"
 horizontal_alignment = 1
 
@@ -253,11 +257,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="CloseButton" type="Button" parent="UI/QuizDialog/VBoxContainer/HeaderContainer"]
-custom_minimum_size = Vector2(40, 40)
+custom_minimum_size = Vector2(60, 60)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("5_barlow_bold")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 36
 theme_override_styles/normal = SubResource("CloseButtonStyle")
 text = "×"
 
@@ -273,6 +277,16 @@ bbcode_enabled = true
 text = "Preparando pergunta de múltipla escolha..."
 fit_content = true
 scroll_active = false
+
+[node name="WrongAnswerAnimation" type="Label" parent="UI/QuizDialog/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.2, 0.2, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 120
+text = "❌"
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="OptionsContainer" type="VBoxContainer" parent="UI/QuizDialog/VBoxContainer"]
 custom_minimum_size = Vector2(0, 400)

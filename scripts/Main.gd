@@ -13,6 +13,8 @@ extends Node3D
 @onready var quiz_dialog = $UI/QuizDialog
 @onready var quiz_question = $UI/QuizDialog/VBoxContainer/QuizQuestion
 @onready var quiz_close_button = $UI/QuizDialog/VBoxContainer/HeaderContainer/CloseButton
+@onready var quiz_attempt_count = $UI/QuizDialog/VBoxContainer/HeaderContainer/AttemptCount
+@onready var quiz_wrong_animation = $UI/QuizDialog/VBoxContainer/WrongAnswerAnimation
 @onready var quiz_option_a = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionA
 @onready var quiz_option_b = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionB
 @onready var quiz_option_c = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionC
@@ -307,6 +309,25 @@ func open_traditional_chat(chat_npc):
 	generate_question_for_npc(chat_npc)
 	chat_input.grab_focus()
 
+func update_attempt_counter(npc_name: String):
+	var current_attempts = npc_attempt_counts.get(npc_name, 0)
+	var attempt_number = current_attempts + 1
+	quiz_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
+
+func show_wrong_answer_animation():
+	quiz_wrong_animation.visible = true
+	quiz_wrong_animation.scale = Vector2(0.1, 0.1)
+	
+	# Create animation
+	var tween = create_tween()
+	tween.tween_property(quiz_wrong_animation, "scale", Vector2(1.2, 1.2), 0.3)
+	tween.tween_property(quiz_wrong_animation, "scale", Vector2(1.0, 1.0), 0.2)
+	
+	# Hide after animation
+	await tween.finished
+	await get_tree().create_timer(1.0).timeout
+	quiz_wrong_animation.visible = false
+
 func open_quiz_interface(chat_npc):
 	quiz_dialog.visible = true
 	chat_dialog.visible = false
@@ -317,6 +338,9 @@ func open_quiz_interface(chat_npc):
 	# Initialize attempt count if first time
 	if not npc_attempt_counts.has(chat_npc.npc_name):
 		npc_attempt_counts[chat_npc.npc_name] = 0
+	
+	# Update attempt counter display
+	update_attempt_counter(chat_npc.npc_name)
 	
 	# Show loading message
 	quiz_question.text = "Preparando pergunta de múltipla escolha..."
@@ -440,15 +464,20 @@ func _on_quiz_option_selected(option_index: int):
 		npc_attempt_counts[current_npc_name] = npc_attempt_counts.get(current_npc_name, 0) + 1
 		var current_attempts = npc_attempt_counts[current_npc_name]
 		
-		quiz_question.text += "\n\n[color=red][b]❌ Resposta incorreta![/b][/color]"
-		quiz_question.text += "\n[color=yellow]A resposta correta era: " + get_correct_option_text() + "[/color]"
+		# Update attempt counter display
+		update_attempt_counter(current_npc_name)
+		
+		# Show wrong answer animation
+		show_wrong_answer_animation()
+		
+		quiz_question.text += "\n\n[color=red][b]Resposta incorreta![/b][/color]"
+		quiz_question.text += "\n[color=#00f6ff]A resposta correta era: " + get_correct_option_text() + "[/color]"
 		
 		if current_attempts >= 3:
 			quiz_question.text += "\n[color=red][b]📝 Você já tentou 3 vezes.[/b][/color]"
 			quiz_question.text += "\n[color=yellow][b]💡 Sugestão: Estude mais sobre " + current_npc_subject + " e volte depois![/b][/color]"
 		else:
-			var remaining_attempts = 3 - current_attempts
-			quiz_question.text += "\n[color=orange][b]🔄 Gerando nova pergunta... (Tentativas restantes: " + str(remaining_attempts) + ")[/b][/color]"
+			quiz_question.text += "\n[color=#00f6ff][b]🔄 Gerando nova pergunta...[/b][/color]"
 			
 			# Wait a bit then generate new question
 			await get_tree().create_timer(2.0).timeout
