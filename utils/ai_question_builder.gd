@@ -540,6 +540,63 @@ func calculate_text_similarity(text1: String, text2: String) -> float:
 	
 	return float(common_words) / float(total_words) if total_words > 0 else 0.0
 
+# Função para extrair JSON da resposta da IA (pode vir com markdown)
+func parse_ai_response(ai_response: String) -> Dictionary:
+	print("🔍 Tentando fazer parse da resposta da IA...")
+	print("🔍 Resposta bruta (primeiros 200 chars): ", ai_response.substr(0, 200))
+	
+	# Tentar parse direto primeiro
+	var json_result = JSON.parse_string(ai_response)
+	if json_result and json_result is Dictionary:
+		print("✅ Parse direto funcionou!")
+		return json_result
+	
+	# Se não funcionou, tentar extrair JSON do markdown
+	var json_text = extract_json_from_markdown(ai_response)
+	if json_text != "":
+		print("🔍 JSON extraído do markdown: ", json_text.substr(0, 200))
+		json_result = JSON.parse_string(json_text)
+		if json_result and json_result is Dictionary:
+			print("✅ Parse do markdown funcionou!")
+			return json_result
+	
+	print("❌ Falha em todos os métodos de parse")
+	return {}
+
+# Função para extrair JSON de texto com markdown
+func extract_json_from_markdown(text: String) -> String:
+	# Procurar por blocos de código JSON
+	var lines = text.split("\n")
+	var in_json_block = false
+	var json_lines = []
+	
+	for line in lines:
+		# Detectar início de bloco JSON
+		if line.strip_edges().begins_with("```json") or line.strip_edges().begins_with("```"):
+			in_json_block = true
+			continue
+		
+		# Detectar fim de bloco JSON
+		if in_json_block and line.strip_edges() == "```":
+			break
+		
+		# Coletar linhas dentro do bloco JSON
+		if in_json_block:
+			json_lines.append(line)
+	
+	# Se encontrou um bloco JSON, retornar
+	if json_lines.size() > 0:
+		return "\n".join(json_lines)
+	
+	# Se não encontrou bloco, procurar por JSON solto
+	var json_start = text.find("{")
+	var json_end = text.rfind("}")
+	
+	if json_start != -1 and json_end != -1 and json_end > json_start:
+		return text.substr(json_start, json_end - json_start + 1)
+	
+	return ""
+
 func _on_http_request_completed(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
 	print("📨 Resposta recebida - Código: ", response_code)
 	
@@ -570,7 +627,7 @@ func _on_http_request_completed(_result: int, response_code: int, _headers: Pack
 		return
 	
 	# Parse da resposta da IA como JSON
-	var quiz_item = JSON.parse_string(ai_response)
+	var quiz_item = parse_ai_response(ai_response)
 	if not quiz_item or not quiz_item is Dictionary:
 		print("❌ JSON da IA inválido")
 		_regenerate_with_feedback("JSON da IA inválido")
