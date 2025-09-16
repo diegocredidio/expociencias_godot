@@ -20,6 +20,13 @@ extends Node3D
 @onready var quiz_option_c = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionC
 @onready var quiz_option_d = $UI/QuizDialog/VBoxContainer/OptionsContainer/OptionD
 
+# Open Question elements
+@onready var open_question_container = $UI/QuizDialog/VBoxContainer/OpenQuestionContainer
+@onready var answer_input = $UI/QuizDialog/VBoxContainer/OpenQuestionContainer/AnswerInput
+@onready var submit_button = $UI/QuizDialog/VBoxContainer/OpenQuestionContainer/SubmitButton
+@onready var score_display = $UI/QuizDialog/VBoxContainer/ScoreDisplay
+@onready var feedback_text = $UI/QuizDialog/VBoxContainer/FeedbackText
+
 # AI Question Builder
 var ai_question_builder: AIQuestionBuilder
 
@@ -45,6 +52,10 @@ var current_timeout_timer = null # Store current timeout timer for cancellation
 # Quiz variables
 var current_quiz_data = {} # Store current quiz question and options
 var correct_answer_index = 0 # Index of correct answer (0-3)
+
+# Open Question variables
+var current_open_question_data = {} # Store current open question data
+var is_open_question_mode = false # Flag to indicate if we're in open question mode
 
 # Sistema de portas novo
 var registered_doors = {} # Armazenar portas por nome
@@ -112,6 +123,10 @@ func _ready():
 	ai_question_builder.quiz_ready.connect(_on_quiz_ready)
 	ai_question_builder.generation_failed.connect(_on_quiz_generation_failed)
 	print("🤖 AIQuestionBuilder inicializado")
+	
+	# Conectar sinais da interface de perguntas abertas
+	submit_button.pressed.connect(_on_open_question_submit_pressed)
+	print("📝 Sinais de perguntas abertas conectados")
 	
 	# Adicionar ao grupo main para portas se registrarem
 	add_to_group("main")
@@ -412,6 +427,25 @@ func open_quiz_interface(chat_npc):
 	quiz_dialog.visible = true
 	chat_dialog.visible = false
 	
+	# Verificar se é o diretor (pergunta aberta)
+	var is_director = chat_npc.npc_name == "Diretor Oliveira"
+	
+	if is_director:
+		open_open_question_mode(chat_npc)
+	else:
+		open_multiple_choice_mode(chat_npc)
+
+func open_multiple_choice_mode(chat_npc):
+	is_open_question_mode = false
+	
+	# Esconder elementos de pergunta aberta
+	open_question_container.visible = false
+	score_display.visible = false
+	feedback_text.visible = false
+	
+	# Mostrar elementos de múltipla escolha
+	quiz_option_a.get_parent().visible = true
+	
 	# LIMPAR CACHE COMPLETAMENTE para evitar dessincronização
 	clear_quiz_cache()
 	
@@ -428,6 +462,117 @@ func open_quiz_interface(chat_npc):
 	
 	# Generate quiz question
 	generate_quiz_question_for_npc(chat_npc)
+
+func open_open_question_mode(chat_npc):
+	is_open_question_mode = true
+	
+	# Esconder elementos de múltipla escolha
+	quiz_option_a.get_parent().visible = false
+	
+	# Mostrar elementos de pergunta aberta
+	open_question_container.visible = true
+	
+	# Initialize attempt count if first time
+	if not npc_attempt_counts.has(chat_npc.npc_name):
+		npc_attempt_counts[chat_npc.npc_name] = 0
+	
+	# Update attempt counter display
+	update_attempt_counter(chat_npc.npc_name)
+	
+	# Show loading message
+	quiz_question.text = "Preparando pergunta aberta do diretor..."
+	answer_input.text = ""
+	answer_input.editable = false
+	submit_button.disabled = true
+	score_display.visible = false
+	feedback_text.visible = false
+	
+	# Generate open question
+	generate_open_question_for_npc(chat_npc)
+
+# Função para gerar pergunta aberta do diretor
+func generate_open_question_for_npc(chat_npc):
+	current_npc_name = chat_npc.npc_name
+	current_npc_subject = "multidisciplinar"
+	
+	# Gerar prompt de variedade para perguntas abertas
+	var topic_variety_prompt = get_open_question_variety_prompt(chat_npc.npc_name, npc_attempt_counts.get(chat_npc.npc_name, 0))
+	
+	# Solicitar pergunta aberta
+	ai_question_builder.request_open_question(
+		chat_npc.npc_name,
+		topic_variety_prompt,
+		npc_attempt_counts.get(chat_npc.npc_name, 0),
+		supabase_proxy_url,
+		SupabaseConfig.ANON_KEY
+	)
+
+# Função para gerar prompt de variedade para perguntas abertas do diretor
+func get_open_question_variety_prompt(npc_name: String, attempt_count: int) -> String:
+	if attempt_count == 0:
+		return "Esta é a primeira pergunta aberta do diretor. Crie uma questão multidisciplinar interessante que combine conceitos de diferentes áreas do conhecimento para revisão final."
+	elif attempt_count == 1:
+		return "Segunda pergunta aberta do diretor. Varie completamente o tema da anterior. Pode mesclar disciplinas diferentes (ex: Matemática + Geografia, Português + História, Ciências + Arte)."
+	else:
+		return "Terceira pergunta aberta do diretor. Use um tema completamente diferente das anteriores. Seja criativo e combine disciplinas de forma inovadora para uma revisão final abrangente."
+
+# Função para lidar com envio da resposta
+func _on_open_question_submit_pressed():
+	var student_answer = answer_input.text.strip_edges()
+	
+	if student_answer == "":
+		print("❌ Resposta vazia")
+		return
+	
+	print("📝 Resposta do aluno: ", student_answer)
+	
+	# Validar resposta usando o AIQuestionBuilder
+	var validation_result = ai_question_builder.validate_student_answer(student_answer, current_open_question_data)
+	
+	print("📊 Pontuação: ", validation_result.score, "%")
+	print("✅ Correta: ", validation_result.is_correct)
+	print("💬 Feedback: ", validation_result.feedback)
+	
+	# Exibir resultado
+	display_open_question_result(validation_result)
+	
+	# Incrementar tentativas
+	var npc_name = current_npc_name
+	npc_attempt_counts[npc_name] = npc_attempt_counts.get(npc_name, 0) + 1
+	
+	# Verificar se ainda há tentativas restantes
+	var remaining_attempts = 3 - npc_attempt_counts[npc_name]
+	if remaining_attempts > 0 and not validation_result.is_correct:
+		# Preparar para próxima tentativa
+		await get_tree().create_timer(3.0).timeout
+		generate_open_question_for_npc(current_npc)
+
+# Função para exibir resultado da pergunta aberta
+func display_open_question_result(validation_result: Dictionary):
+	# Desabilitar campo de resposta
+	answer_input.editable = false
+	submit_button.disabled = true
+	
+	# Exibir pontuação (mais generosa - mostrar 10% a menos)
+	var displayed_score = max(0, validation_result.score - 10)
+	score_display.text = "Pontuação: " + str(int(displayed_score)) + "%"
+	score_display.visible = true
+	
+	# Exibir feedback
+	var feedback_text_content = validation_result.feedback + "\n\n"
+	
+	if validation_result.concepts_found.size() > 0:
+		feedback_text_content += "[color=#00f6ff]Conceitos encontrados: " + ", ".join(validation_result.concepts_found) + "[/color]\n"
+	
+	if validation_result.concepts_missing.size() > 0:
+		feedback_text_content += "[color=orange]Conceitos em falta: " + ", ".join(validation_result.concepts_missing) + "[/color]\n"
+	
+	feedback_text_content += "\n[color=#5297df]Explicação: " + current_open_question_data.rationale + "[/color]"
+	
+	feedback_text.text = feedback_text_content
+	feedback_text.visible = true
+	
+	print("✅ Resultado da pergunta aberta exibido!")
 
 func close_chat():
 	chat_dialog.visible = false
@@ -817,47 +962,72 @@ func _on_quiz_ready(quiz_item: Dictionary):
 	print("🎉 Quiz gerado com sucesso pelo AIQuestionBuilder!")
 	awaiting_question = false
 	
-	# Exibir pergunta
-	quiz_question.text = quiz_item.question
-	
-	# Exibir alternativas (sem prefixos A) B) C) D))
-	quiz_option_a.text = quiz_item.options.A
-	quiz_option_b.text = quiz_item.options.B
-	quiz_option_c.text = quiz_item.options.C
-	quiz_option_d.text = quiz_item.options.D
-	
-	# Ajustar altura dos botões para texto longo
-	adjust_all_button_heights()
-	
-	# Armazenar resposta correta para validação
-	match quiz_item.correct:
-		"A": correct_answer_index = 0
-		"B": correct_answer_index = 1
-		"C": correct_answer_index = 2
-		"D": correct_answer_index = 3
-		_: correct_answer_index = 0
-	
-	# Armazenar explicação para mostrar após resposta
-	current_quiz_data["rationale"] = quiz_item.rationale
-	current_quiz_data["topic_hint"] = quiz_item.topic_hint
-	
-	# Habilitar botões
-	enable_quiz_buttons()
-	
-	print("✅ Quiz exibido na interface!")
-	print("🎯 Pergunta: ", quiz_item.question)
-	print("🎯 Resposta correta: ", quiz_item.correct)
-	print("🎯 Explicação: ", quiz_item.rationale)
+	if is_open_question_mode:
+		# Lidar com pergunta aberta do diretor
+		print("🎯 Disciplinas: ", quiz_item.subjects)
+		print("🎯 Conceitos-chave: ", quiz_item.key_concepts)
+		print("🎯 Resposta esperada: ", quiz_item.expected_answer)
+		
+		# Armazenar dados da pergunta aberta
+		current_open_question_data = quiz_item
+		
+		# Exibir pergunta
+		quiz_question.text = quiz_item.question
+		
+		# Habilitar campo de resposta
+		answer_input.editable = true
+		answer_input.text = ""
+		submit_button.disabled = false
+		
+		print("✅ Pergunta aberta exibida na interface!")
+	else:
+		# Lidar com múltipla escolha
+		# Exibir pergunta
+		quiz_question.text = quiz_item.question
+		
+		# Exibir alternativas (sem prefixos A) B) C) D))
+		quiz_option_a.text = quiz_item.options.A
+		quiz_option_b.text = quiz_item.options.B
+		quiz_option_c.text = quiz_item.options.C
+		quiz_option_d.text = quiz_item.options.D
+		
+		# Ajustar altura dos botões para texto longo
+		adjust_all_button_heights()
+		
+		# Armazenar resposta correta para validação
+		match quiz_item.correct:
+			"A": correct_answer_index = 0
+			"B": correct_answer_index = 1
+			"C": correct_answer_index = 2
+			"D": correct_answer_index = 3
+			_: correct_answer_index = 0
+		
+		# Armazenar explicação para mostrar após resposta
+		current_quiz_data["rationale"] = quiz_item.rationale
+		current_quiz_data["topic_hint"] = quiz_item.topic_hint
+		
+		# Habilitar botões
+		enable_quiz_buttons()
+		
+		print("✅ Quiz exibido na interface!")
+		print("🎯 Pergunta: ", quiz_item.question)
+		print("🎯 Resposta correta: ", quiz_item.correct)
+		print("🎯 Explicação: ", quiz_item.rationale)
 
 func _on_quiz_generation_failed(reason: String):
 	print("❌ Falha na geração do quiz: ", reason)
 	awaiting_question = false
 	
-	# Mostrar mensagem de fallback
-	quiz_question.text = "❌ Não foi possível gerar a questão, tente novamente.\n\nMotivo: " + reason
-	
-	# Resetar botões
-	reset_quiz_buttons()
+	if is_open_question_mode:
+		# Mostrar mensagem de erro para pergunta aberta
+		quiz_question.text = "[color=red]❌ Erro ao gerar pergunta: " + reason + "[/color]\n\n[color=yellow]Tente novamente em alguns instantes.[/color]"
+		answer_input.editable = false
+		submit_button.disabled = true
+	else:
+		# Mostrar mensagem de fallback para múltipla escolha
+		quiz_question.text = "❌ Não foi possível gerar a questão, tente novamente.\n\nMotivo: " + reason
+		# Resetar botões
+		reset_quiz_buttons()
 
 func parse_and_display_quiz_json(quiz_data: Dictionary):
 	print("🔍 === PARSING QUIZ JSON ===")

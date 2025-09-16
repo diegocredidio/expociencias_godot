@@ -344,3 +344,61 @@ theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "D) Carregando..."
 text_overrun_behavior = 3
 autowrap_mode = 3
+
+[node name="OpenQuestionContainer" type="VBoxContainer" parent="UI/QuizDialog/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 15
+
+[node name="AnswerLabel" type="Label" parent="UI/QuizDialog/VBoxContainer/OpenQuestionContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 24
+text = "Sua resposta:"
+horizontal_alignment = 1
+
+[node name="AnswerInput" type="TextEdit" parent="UI/QuizDialog/VBoxContainer/OpenQuestionContainer"]
+custom_minimum_size = Vector2(0, 120)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_colors/background_color = Color(0.1, 0.1, 0.15, 0.8)
+theme_override_fonts/font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("ChatHistoryStyle")
+placeholder_text = "Digite sua resposta aqui..."
+wrap_mode = 1
+
+[node name="SubmitButton" type="Button" parent="UI/QuizDialog/VBoxContainer/OpenQuestionContainer"]
+custom_minimum_size = Vector2(0, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/normal = SubResource("QuizButtonStyle")
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+text = "Enviar Resposta"
+
+[node name="ScoreDisplay" type="Label" parent="UI/QuizDialog/VBoxContainer"]
+visible = false
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.965, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 36
+text = "Pontuação: 85%"
+horizontal_alignment = 1
+
+[node name="FeedbackText" type="RichTextLabel" parent="UI/QuizDialog/VBoxContainer"]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
+theme_override_fonts/bold_font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/normal_font_size = 32
+theme_override_styles/normal = SubResource("ChatHistoryStyle")
+bbcode_enabled = true
+text = "Feedback da resposta..."
+fit_content = true
+scroll_active = false
