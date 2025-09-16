@@ -38,6 +38,10 @@ corner_radius_bottom_right = 12
 corner_radius_bottom_left = 12
 
 [sub_resource type="StyleBoxFlat" id="QuizButtonHoverStyle"]
+content_margin_left = 20.0
+content_margin_top = 15.0
+content_margin_right = 20.0
+content_margin_bottom = 15.0
 bg_color = Color(0.3, 0.4, 0.6, 0.95)
 border_width_left = 2
 border_width_top = 2
@@ -50,6 +54,10 @@ corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
 
 [sub_resource type="StyleBoxFlat" id="QuizButtonStyle"]
+content_margin_left = 20.0
+content_margin_top = 15.0
+content_margin_right = 20.0
+content_margin_bottom = 15.0
 bg_color = Color(0.2, 0.3, 0.5, 0.9)
 border_width_left = 2
 border_width_top = 2
@@ -192,12 +200,13 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = -20.0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 20
 
 [node name="QuizNPCName" type="Label" parent="UI/QuizDialog/VBoxContainer"]
 layout_mode = 2
@@ -218,10 +227,12 @@ bbcode_enabled = true
 text = "Preparando pergunta de múltipla escolha..."
 
 [node name="OptionsContainer" type="VBoxContainer" parent="UI/QuizDialog/VBoxContainer"]
-custom_minimum_size = Vector2(0, 300)
+custom_minimum_size = Vector2(0, 400)
 layout_mode = 2
+theme_override_constants/separation = 20
 
 [node name="OptionA" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")
@@ -231,6 +242,7 @@ theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "A) Carregando..."
 
 [node name="OptionB" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")
@@ -240,6 +252,7 @@ theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "B) Carregando..."
 
 [node name="OptionC" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")
@@ -249,6 +262,7 @@ theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "C) Carregando..."
 
 [node name="OptionD" type="Button" parent="UI/QuizDialog/VBoxContainer/OptionsContainer"]
+custom_minimum_size = Vector2(0, 80)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/font = ExtResource("4_barlow_regular")

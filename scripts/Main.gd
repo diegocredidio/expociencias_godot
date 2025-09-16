@@ -693,7 +693,7 @@ func generate_quiz_question_for_npc(npc):
 	
 	# Criar prompt simplificado para o proxy
 	var simplified_prompt = "Crie uma pergunta de múltipla escolha sobre " + current_npc_subject + " para alunos do 6º ano do ensino fundamental."
-	simplified_prompt += " A pergunta deve ter 4 alternativas (A, B, C, D) e ser apropriada para a idade."
+	simplified_prompt += " A pergunta deve ter 4 alternativas e ser apropriada para a idade."
 	simplified_prompt += " Professor: " + current_npc_name
 	
 	print("🌐 Enviando requisição de quiz para proxy Supabase...")
@@ -730,7 +730,7 @@ func parse_and_display_quiz_json(quiz_data: Dictionary):
 	match correct_index:
 		0: correct_letter = "A"
 		1: correct_letter = "B"
-		2: correct_letter = "C"  
+		2: correct_letter = "C"
 		3: correct_letter = "D"
 	
 	print("🔍 Question: ", question_text)
@@ -741,7 +741,7 @@ func parse_and_display_quiz_json(quiz_data: Dictionary):
 	if question_text != "" and options.size() >= 4:
 		quiz_question.text = question_text
 		quiz_option_a.text = options[0]
-		quiz_option_b.text = options[1] 
+		quiz_option_b.text = options[1]
 		quiz_option_c.text = options[2]
 		quiz_option_d.text = options[3]
 		
@@ -1362,7 +1362,6 @@ func _on_test_response_received(_result: int, response_code: int, _headers: Pack
 			node.queue_free()
 
 func evaluate_student_answer(user_answer: String, npc):
-	
 	if not npc or not is_instance_valid(npc):
 		chat_history.text += "\n[color=red][b]❌ ERRO:[/b] NPC inválido para avaliação![/color]"
 		return
@@ -1414,7 +1413,6 @@ func evaluate_student_answer(user_answer: String, npc):
 
 func request_ai_response(user_message: String, _npc):
 	# Using Supabase proxy - no API key validation needed
-	
 	# Clean up existing requests
 	var existing_http = get_children().filter(func(node): return node is HTTPRequest)
 	for node in existing_http:
