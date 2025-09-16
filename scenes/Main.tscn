@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://bo8uyc0lpjlpj"]
+[gd_scene load_steps=11 format=3 uid="uid://bo8uyc0lpjlpj"]
 
 [ext_resource type="Script" uid="uid://dty27ima3k8sw" path="res://scripts/Main.gd" id="1_5qnwj"]
 [ext_resource type="PackedScene" uid="uid://cj8w5d1hbp0no" path="res://scenes/Player.tscn" id="2_8vhkm"]
@@ -7,6 +7,9 @@
 [ext_resource type="FontFile" uid="uid://dd3b57u6b4kqw" path="res://fonts/Barlow-Bold.ttf" id="5_barlow_bold"]
 [ext_resource type="FontFile" uid="uid://cptljk3p3f3a2" path="res://fonts/Barlow-SemiBold.ttf" id="6_barlow_semibold"]
 [ext_resource type="Texture2D" uid="uid://cyh5t3mxf887f" path="res://ui/icons/send.svg" id="7_nxtc6"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_nxtc6"]
+size = Vector3(89.4974, 1, 74.6561)
 
 [sub_resource type="StyleBoxFlat" id="ChatDialogStyle"]
 bg_color = Color(0, 0.00392157, 0.0392157, 1)
@@ -40,8 +43,14 @@ script = ExtResource("1_5qnwj")
 
 [node name="DungeonLevel" parent="." instance=ExtResource("3_h3xp4")]
 
+[node name="StaticBody3D" type="StaticBody3D" parent="DungeonLevel"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="DungeonLevel/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.754, -0.221, -26.897)
+shape = SubResource("BoxShape3D_nxtc6")
+
 [node name="Player" parent="." instance=ExtResource("2_8vhkm")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.59, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.59, 1, 0)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.707107, -0.5, 0.5, 0, 0.707107, 0.707107, -0.707107, -0.5, 0.5, 0, 10, 0)

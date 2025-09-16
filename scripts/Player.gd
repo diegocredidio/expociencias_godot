@@ -8,6 +8,7 @@ signal interact_requested
 @export var jump_velocity = 8.0
 @export var acceleration = 15.0
 @export var friction = 40.0
+@export var initial_y_position: float = 0 # Posição Y inicial do player
 
 @onready var interaction_area = $InteractionArea
 @onready var character_model = $CharacterModel
@@ -28,14 +29,14 @@ func _ready():
 	if character_model:
 		original_model_y = character_model.position.y
 	
-	# Garantir que o player comece no chão
-	position.y = 0.0
+	# Definir posição Y inicial
+	position.y = initial_y_position
 	
 	# Aguardar um frame para garantir que a física seja inicializada
 	await get_tree().process_frame
 	# Verificar se está no chão, se não estiver, ajustar posição
 	if not is_on_floor():
-		position.y = 0.0
+		position.y = initial_y_position
 		# Forçar uma atualização da física
 		await get_tree().process_frame
 	
@@ -61,7 +62,7 @@ func _physics_process(delta):
 	# Movement detection
 	
 	# Verificação manual adicional de NPCs próximos a cada segundo
-	if Engine.get_process_frames() % 60 == 0:  # A cada 60 frames (aprox. 1 segundo)
+	if Engine.get_process_frames() % 60 == 0: # A cada 60 frames (aprox. 1 segundo)
 		manual_proximity_check()
 	
 	# Detectar se há input de movimento
@@ -226,7 +227,7 @@ func manual_proximity_check():
 	for npc in all_npcs:
 		if npc and is_instance_valid(npc):
 			var distance = global_position.distance_to(npc.global_position)
-			if distance <= 2.0:  # Dentro do raio de interação
+			if distance <= 2.0: # Dentro do raio de interação
 				if npc not in interactable_npcs:
 					print("🔧 BACKUP: NPC detectado manualmente: ", npc.name)
 					interactable_npcs.append(npc)
@@ -239,7 +240,7 @@ func manual_proximity_check():
 	for npc in interactable_npcs.duplicate():
 		if npc and is_instance_valid(npc):
 			var distance = global_position.distance_to(npc.global_position)
-			if distance > 2.5:  # Um pouco mais longe para evitar flicker
+			if distance > 2.5: # Um pouco mais longe para evitar flicker
 				print("🔧 BACKUP: NPC removido por distância: ", npc.name)
 				if npc.has_method("hide_chat_indicator"):
 					npc.hide_chat_indicator()
