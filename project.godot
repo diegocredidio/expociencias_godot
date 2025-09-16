@@ -61,3 +61,4 @@ ssl/certificates=""
 [rendering]
 
 renderer/rendering_method.mobile="gl_es3"
+environment/defaults/default_clear_color=Color(0, 0, 0.05, 1)

@@ -941,7 +941,7 @@ func generate_quiz_question_for_npc(npc):
 		node.queue_free()
 	
 	# Mostrar loading state
-	quiz_question.text = "🤖 Gerando pergunta inteligente..."
+	quiz_question.text = "🤖 Gerando pergunta..."
 	reset_quiz_buttons()
 	
 	# Obter prompt de variedade de tópicos
