@@ -738,6 +738,28 @@ func enable_quiz_buttons():
 	quiz_option_d.disabled = false
 	print("🔓 Botões do quiz habilitados (enable_quiz_buttons)")
 
+func shuffle_quiz_options(options: Array, correct_index: int) -> Dictionary:
+	"""Embaralha as opções de quiz e retorna o novo índice da resposta correta"""
+	var shuffled_options = options.duplicate()
+	var correct_answer = options[correct_index]
+	
+	# Embaralhar o array
+	for i in range(shuffled_options.size()):
+		var j = randi() % shuffled_options.size()
+		var temp = shuffled_options[i]
+		shuffled_options[i] = shuffled_options[j]
+		shuffled_options[j] = temp
+	
+	# Encontrar o novo índice da resposta correta
+	var new_correct_index = shuffled_options.find(correct_answer)
+	
+	print("🎲 Alternativas embaralhadas - resposta correta agora é índice: ", new_correct_index)
+	
+	return {
+		"options": shuffled_options,
+		"correct_index": new_correct_index
+	}
+
 func _on_quiz_option_selected(option_index: int):
 	print("📝 === QUIZ OPTION SELECTED ===")
 	print("📝 Opção selecionada: ", option_index, " (Correta: ", correct_answer_index, ")")
@@ -1025,22 +1047,31 @@ func _on_quiz_ready(quiz_item: Dictionary):
 		# Exibir pergunta
 		quiz_question.text = quiz_item.question
 		
-		# Exibir alternativas (sem prefixos A) B) C) D))
-		quiz_option_a.text = quiz_item.options.A
-		quiz_option_b.text = quiz_item.options.B
-		quiz_option_c.text = quiz_item.options.C
-		quiz_option_d.text = quiz_item.options.D
+		# Preparar array de opções para embaralhar
+		var original_options = [quiz_item.options.A, quiz_item.options.B, quiz_item.options.C, quiz_item.options.D]
+		var original_correct_index = 0
+		match quiz_item.correct:
+			"A": original_correct_index = 0
+			"B": original_correct_index = 1
+			"C": original_correct_index = 2
+			"D": original_correct_index = 3
+		
+		# Embaralhar alternativas
+		var shuffle_result = shuffle_quiz_options(original_options, original_correct_index)
+		var shuffled_options = shuffle_result.options
+		var new_correct_index = shuffle_result.correct_index
+		
+		# Exibir alternativas embaralhadas
+		quiz_option_a.text = shuffled_options[0]
+		quiz_option_b.text = shuffled_options[1]
+		quiz_option_c.text = shuffled_options[2]
+		quiz_option_d.text = shuffled_options[3]
 		
 		# Ajustar altura dos botões para texto longo
 		adjust_all_button_heights()
 		
 		# Armazenar resposta correta para validação
-		match quiz_item.correct:
-			"A": correct_answer_index = 0
-			"B": correct_answer_index = 1
-			"C": correct_answer_index = 2
-			"D": correct_answer_index = 3
-			_: correct_answer_index = 0
+		correct_answer_index = new_correct_index
 		
 		# Armazenar explicação para mostrar após resposta
 		current_quiz_data["rationale"] = quiz_item.rationale
@@ -1123,18 +1154,23 @@ func parse_and_display_quiz_json(quiz_data: Dictionary):
 	print("🔍 Options: ", options)
 	print("🔍 Correct answer: ", correct_letter, " (index ", correct_index, ")")
 	
+	# Embaralhar alternativas para randomizar posição da resposta correta
+	var shuffle_result = shuffle_quiz_options(options, correct_index)
+	var shuffled_options = shuffle_result.options
+	var new_correct_index = shuffle_result.correct_index
+	
 	# Display the quiz
 	quiz_question.text = question_text
-	quiz_option_a.text = options[0]
-	quiz_option_b.text = options[1]
-	quiz_option_c.text = options[2]
-	quiz_option_d.text = options[3]
+	quiz_option_a.text = shuffled_options[0]
+	quiz_option_b.text = shuffled_options[1]
+	quiz_option_c.text = shuffled_options[2]
+	quiz_option_d.text = shuffled_options[3]
 	
 	# Adjust button heights for long text
 	adjust_all_button_heights()
 	
 	# Store correct answer for validation
-	correct_answer_index = correct_index
+	correct_answer_index = new_correct_index
 	
 	# Enable quiz buttons
 	enable_quiz_buttons()
@@ -1268,12 +1304,13 @@ func create_quiz_prompt(npc) -> String:
 			base_prompt += "EVITE PERGUNTAS COMO: 'Qual operação matemática você acha mais fácil?', 'Que figura geométrica mais gosta?', 'Prefere números pares ou ímpares?' "
 		"História":
 			base_prompt += "BNCC 6º ano HISTÓRIA - UNIDADES TEMÁTICAS:\n"
-			base_prompt += "⏰ TEMPO HISTÓRICO: Cronologia e periodização; fontes históricas (escritas, orais, iconográficas); "
-			base_prompt += "👥 SOCIEDADE E CULTURA: Diversidade cultural; tradições e costumes; identidade e alteridade; "
-			base_prompt += "🔧 TRABALHO E TECNOLOGIA: Evolução das técnicas; impacto das tecnologias na sociedade; "
-			base_prompt += "🇧🇷 BRASIL: Formação do território brasileiro; diversidade regional; patrimônio histórico e cultural. "
-			base_prompt += "EXEMPLOS OBJETIVOS HISTÓRIA: 'Em que século ocorreu o descobrimento do Brasil?', 'Qual foi a primeira capital do Brasil?', 'Quantos períodos tem a Pré-História?' "
-			base_prompt += "EVITE PERGUNTAS COMO: 'Qual período histórico você gostaria de visitar?', 'Que civilização acha mais interessante?', 'Preferia viver na cidade ou no campo?' "
+			base_prompt += "⏰ TEMPO HISTÓRICO: Datas específicas, ordem cronológica, séculos; fontes históricas concretas; "
+			base_prompt += "👥 POVOS DO BRASIL: Indígenas, africanos, portugueses; fatos históricos específicos; "
+			base_prompt += "🔧 TECNOLOGIA: Invenções específicas, ferramentas, mudanças concretas; "
+			base_prompt += "🇧🇷 BRASIL COLONIAL: Capitanias, governadores, cidades fundadas, marcos históricos. "
+			base_prompt += "PERGUNTAS DEVEM SER FACTUAIS: 'Em que ano foi fundada Salvador?', 'Quem foi o primeiro governador-geral do Brasil?', 'Quantas capitanias hereditárias existiam?' "
+			base_prompt += "SEMPRE PERGUNTE SOBRE FATOS CONCRETOS: datas, nomes, locais, quantidades, eventos específicos. "
+			base_prompt += "NUNCA FAÇA PERGUNTAS SUBJETIVAS COMO: 'Qual personagem você escolheria?', 'Que época preferia?', 'Quem admiraria?', 'Qual seria seu amigo?' "
 		"Revisão Geral":
 			base_prompt += "BNCC 6º ano - REVISÃO INTERDISCIPLINAR:\n"
 			base_prompt += "📚 PORTUGUÊS: Leitura, escrita, oralidade e análise linguística; "
@@ -1487,14 +1524,22 @@ func parse_and_display_quiz(quiz_content: String):
 		quiz_question.text += "\n\n[b]PERGUNTA:[/b]\n" + question_text
 		quiz_question.text += "\n[color=gray][i](Tentativas restantes: " + str(remaining_attempts) + ")[/i][/color]"
 	
+	# Embaralhar alternativas para randomizar posição da resposta correta
+	var shuffle_result = shuffle_quiz_options(new_options, new_correct_index)
+	var shuffled_options = shuffle_result.options
+	var final_correct_index = shuffle_result.correct_index
+	
 	# Set the button options
-	quiz_option_a.text = "A) " + new_options[0]
-	quiz_option_b.text = "B) " + new_options[1]
-	quiz_option_c.text = "C) " + new_options[2]
-	quiz_option_d.text = "D) " + new_options[3]
+	quiz_option_a.text = "A) " + shuffled_options[0]
+	quiz_option_b.text = "B) " + shuffled_options[1]
+	quiz_option_c.text = "C) " + shuffled_options[2]
+	quiz_option_d.text = "D) " + shuffled_options[3]
 	
 	# Adjust button heights for long text
 	adjust_all_button_heights()
+	
+	# Store the final correct answer index
+	correct_answer_index = final_correct_index
 	
 	# Enable buttons
 	enable_quiz_buttons()
