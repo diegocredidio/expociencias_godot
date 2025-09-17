@@ -4,15 +4,16 @@ importer="texture"
 type="CompressedTexture2D"
 uid="uid://bbehwy2lxnsi0"
 path.s3tc="res://.godot/imported/colormap.png-0da666cf574dc3ffe0b926f14c942ec8.s3tc.ctex"
+path.etc2="res://.godot/imported/colormap.png-0da666cf574dc3ffe0b926f14c942ec8.etc2.ctex"
 metadata={
-"imported_formats": ["s3tc_bptc"],
+"imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
 }
 
 [deps]
 
 source_file="res://kenney_mini-characters/Models/OBJ format/Textures/colormap.png"
-dest_files=["res://.godot/imported/colormap.png-0da666cf574dc3ffe0b926f14c942ec8.s3tc.ctex"]
+dest_files=["res://.godot/imported/colormap.png-0da666cf574dc3ffe0b926f14c942ec8.s3tc.ctex", "res://.godot/imported/colormap.png-0da666cf574dc3ffe0b926f14c942ec8.etc2.ctex"]
 
 [params]
 

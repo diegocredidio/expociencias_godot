@@ -61,4 +61,6 @@ ssl/certificates=""
 [rendering]
 
 renderer/rendering_method.mobile="gl_es3"
+textures/vram_compression/import_s3tc_bptc=true
+textures/vram_compression/import_etc2_astc=true
 environment/defaults/default_clear_color=Color(0, 0, 0.05, 1)
