@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3 uid="uid://bo8uyc0lpjlpj"]
+[gd_scene load_steps=15 format=3 uid="uid://bo8uyc0lpjlpj"]
 
 [ext_resource type="Script" uid="uid://dty27ima3k8sw" path="res://scripts/Main.gd" id="1_5qnwj"]
 [ext_resource type="PackedScene" uid="uid://cj8w5d1hbp0no" path="res://scenes/Player.tscn" id="2_8vhkm"]
@@ -7,6 +7,7 @@
 [ext_resource type="FontFile" uid="uid://dd3b57u6b4kqw" path="res://fonts/Barlow-Bold.ttf" id="5_barlow_bold"]
 [ext_resource type="FontFile" uid="uid://cptljk3p3f3a2" path="res://fonts/Barlow-SemiBold.ttf" id="6_barlow_semibold"]
 [ext_resource type="Texture2D" uid="uid://cyh5t3mxf887f" path="res://ui/icons/send.svg" id="7_nxtc6"]
+[ext_resource type="Texture2D" uid="uid://cqjl2cgrwjs38" path="res://assets/expo-ciencias_title.png" id="8_jlsqs"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nxtc6"]
 size = Vector3(89.4974, 1, 74.6561)
@@ -562,3 +563,75 @@ text = "Concluir"
 [node name="Spacer2" type="Control" parent="UI/CorrectFeedbackDialog/VBoxContainer/ButtonContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="StartScreen" type="Panel" parent="UI"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="UI/StartScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="TitleImageContainer" type="Control" parent="UI/StartScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Expo-cienciasTitle" type="Sprite2D" parent="UI/StartScreen/TitleImageContainer"]
+position = Vector2(200, 100)
+scale = Vector2(0.351266, 0.351266)
+texture = ExtResource("8_jlsqs")
+
+[node name="ButtonContainer" type="Control" parent="UI/StartScreen"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 50.0
+offset_right = 100.0
+offset_bottom = 256.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="StartButton" type="Button" parent="UI/StartScreen/ButtonContainer"]
+visible = false
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = -30.0
+offset_right = 100.0
+offset_bottom = 30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
+text = "INICIAR"

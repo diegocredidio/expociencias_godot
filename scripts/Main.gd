@@ -38,6 +38,11 @@ extends Node3D
 @onready var correct_feedback_content = $UI/CorrectFeedbackDialog/VBoxContainer/FeedbackContent
 @onready var close_feedback_button = $UI/CorrectFeedbackDialog/VBoxContainer/ButtonContainer/CloseButton
 
+# Start Screen elements
+@onready var start_screen = $UI/StartScreen
+@onready var title_sprite = $"UI/StartScreen/TitleImageContainer/Expo-cienciasTitle"
+@onready var start_button = $UI/StartScreen/ButtonContainer/StartButton
+
 # AI Question Builder
 var ai_question_builder: AIQuestionBuilder
 
@@ -70,6 +75,10 @@ var is_open_question_mode = false # Flag to indicate if we're in open question m
 
 # Sistema de portas novo
 var registered_doors = {} # Armazenar portas por nome
+
+# Start Screen control
+var game_started = false
+var pulse_tween: Tween
 
 # Nova função para fazer requisições via proxy Supabase
 func call_supabase_proxy(prompt: String, subject: String = "Educação", quiz_mode: String = "pergunta_aberta") -> String:
@@ -139,9 +148,16 @@ func _ready():
 	submit_button.pressed.connect(_on_open_question_submit_pressed)
 	print("📝 Sinais de perguntas abertas conectados")
 	
+	# Conectar sinal do botão iniciar
+	start_button.pressed.connect(_on_start_button_pressed)
+	print("🚀 Sinal do botão INICIAR conectado")
+	
 	# Adicionar ao grupo main para portas se registrarem
 	add_to_group("main")
 	print("🚪 Main.gd adicionado ao grupo 'main'")
+	
+	# Mostrar tela de abertura
+	initialize_start_screen()
 	
 	# Verificar se SupabaseConfig está disponível
 	if SupabaseConfig.OPENAI_PROXY_URL == "":
@@ -163,6 +179,12 @@ func _ready():
 	# Connect feedback dialog buttons
 	try_again_button.pressed.connect(_on_try_again_button_pressed)
 	close_feedback_button.pressed.connect(_on_close_feedback_button_pressed)
+	
+	# Connect start screen button
+	start_button.pressed.connect(_on_start_button_pressed)
+	
+	# Initialize start screen
+	initialize_start_screen()
 	
 	# Start in fullscreen
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
@@ -221,6 +243,10 @@ func load_openai_key():
 		pass # Create openai_key.txt with API key
 
 func _on_player_interaction_detected(npc):
+	# Não permitir interações até o jogo ter começado
+	if not game_started:
+		return
+		
 	print("🎯 === NPC DETECTADO ===")
 	print("🎯 NPC: ", npc.npc_name if npc else "null")
 	
@@ -235,10 +261,18 @@ func _on_player_interaction_detected(npc):
 	interaction_prompt.visible = true
 
 func _on_player_interaction_lost():
+	# Não permitir interações até o jogo ter começado
+	if not game_started:
+		return
+		
 	interaction_prompt.visible = false
 	current_npc = null
 
 func _on_player_interact_requested():
+	# Não permitir interações até o jogo ter começado
+	if not game_started:
+		return
+		
 	# Use the robust NPC detection system
 	var npc_to_use = get_npc_for_chat()
 	
@@ -2244,3 +2278,117 @@ func ensure_quiz_buttons_enabled():
 	quiz_option_c.disabled = false
 	quiz_option_d.disabled = false
 	print("🔓 Botões do quiz habilitados")
+
+# === FUNÇÕES DA TELA DE ABERTURA ===
+
+func initialize_start_screen():
+	"""Inicializa a tela de abertura com animação de pulse"""
+	print("🎬 Inicializando tela de abertura...")
+	
+	print("🖼️ Usando imagem do título via Sprite2D")
+	
+	# Esconder todos os outros elementos da UI
+	hide_game_ui()
+	
+	# Mostrar tela de abertura
+	start_screen.visible = true
+	title_sprite.visible = true   # Mostrar Sprite2D com a imagem real
+	start_button.visible = false
+	
+	# Iniciar animação de bounce na imagem
+	start_bounce_animation()
+	
+	# Aguardar 3 segundos e mostrar botão
+	await get_tree().create_timer(3.0).timeout
+	show_start_button()
+
+func hide_game_ui():
+	"""Esconde todos os elementos da UI do jogo"""
+	chat_dialog.visible = false
+	quiz_dialog.visible = false
+	interaction_prompt.visible = false
+	incorrect_feedback_dialog.visible = false
+	correct_feedback_dialog.visible = false
+
+func start_bounce_animation():
+	"""Inicia uma animação de bounce suave na imagem do título"""
+	if pulse_tween:
+		pulse_tween.kill()
+	
+	# Começar com a imagem pequena
+	title_sprite.scale = Vector2(0.0, 0.0)
+	
+	pulse_tween = create_tween()
+	pulse_tween.set_ease(Tween.EASE_OUT)
+	pulse_tween.set_trans(Tween.TRANS_BACK)
+	
+	# Animação de bounce: 0 -> escala original com efeito back (bounce)
+	pulse_tween.tween_property(title_sprite, "scale", Vector2(0.351266, 0.351266), 0.8)
+	
+	print("🎾 Animação de bounce iniciada")
+
+func set_title_scale(scale_value: float):
+	"""Define a escala da imagem do título"""
+	title_sprite.scale = Vector2(scale_value, scale_value)
+
+func show_start_button():
+	"""Mostra o botão de iniciar com fade-in"""
+	print("🔘 Mostrando botão INICIAR")
+	start_button.visible = true
+	start_button.modulate.a = 0.0
+	
+	var fade_tween = create_tween()
+	fade_tween.tween_property(start_button, "modulate:a", 1.0, 0.5)
+
+func _on_start_button_pressed():
+	"""Função chamada quando o botão INICIAR é pressionado"""
+	print("🎮 Botão INICIAR pressionado - iniciando jogo...")
+	
+	# Parar animação de bounce se ainda estiver rodando
+	if pulse_tween:
+		pulse_tween.kill()
+	
+	# Fade out da tela de abertura
+	var fade_tween = create_tween()
+	fade_tween.tween_property(start_screen, "modulate:a", 0.0, 1.0)
+	
+	await fade_tween.finished
+	
+	# Esconder tela de abertura e iniciar jogo
+	start_screen.visible = false
+	game_started = true
+	
+	# Restaurar escala normal da imagem
+	title_sprite.scale = Vector2(1.0, 1.0)
+	
+	# Mostrar elementos do jogo
+	show_game_ui()
+	
+	print("🎮 Jogo iniciado!")
+
+func show_game_ui():
+	"""Mostra os elementos da UI do jogo quando necessário"""
+	# Os elementos serão mostrados conforme a interação do jogador
+	# Por enquanto, só garantimos que estão prontos para uso
+	pass
+
+func create_title_placeholder():
+	"""Cria um placeholder visual para o título"""
+	# Criar uma imagem com gradiente para simular o título
+	var image = Image.create(800, 200, false, Image.FORMAT_RGB8)
+	
+	# Criar um gradiente simples
+	for y in range(200):
+		for x in range(800):
+			var color = Color(0.8, 0.8, 0.8)  # Branco acinzentado
+			# Adicionar um pouco de gradiente
+			if x > 100 and x < 700 and y > 50 and y < 150:
+				color = Color(0.9, 0.9, 0.9)
+			image.set_pixel(x, y, color)
+	
+	# Converter para textura
+	var texture = ImageTexture.new()
+	texture.set_image(image)
+	
+	# title_image.texture = texture  # Comentado - usando Sprite2D agora
+	print("🖼️ Placeholder do título criado (branco)")
