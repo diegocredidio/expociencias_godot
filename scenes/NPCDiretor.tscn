@@ -1,0 +1,27 @@
+[gd_scene load_steps=4 format=3 uid="uid://diretor_npc"]
+
+[ext_resource type="Script" uid="uid://dsgbd5wbnbk1q" path="res://scripts/NPC.gd" id="1_h37mr"]
+[ext_resource type="PackedScene" uid="uid://ubkn8phg2e8p" path="res://kenney_mini-characters/Models/GLB format/character-male-b.glb" id="2_npc_model"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_1hc0d"]
+height = 1.6
+
+[node name="NPCDiretor" type="StaticBody3D"]
+script = ExtResource("1_h37mr")
+
+[node name="NPCModel" parent="." instance=ExtResource("2_npc_model")]
+transform = Transform3D(2, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CylinderShape3D_1hc0d")
+
+[node name="Label3D" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 0)
+text = "Professor"
+font_size = 96
+
+[node name="ChatIndicator" type="Label3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+visible = false
+modulate = Color(1, 1, 0, 1)
+font_size = 72

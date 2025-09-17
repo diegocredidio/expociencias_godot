@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://npcold456" path="res://scenes/NPCOld.tscn" id="2_old"]
 [ext_resource type="PackedScene" uid="uid://geografia_npc" path="res://scenes/NPCGeografia.tscn" id="2_geografia"]
 [ext_resource type="PackedScene" uid="uid://historia_npc" path="res://scenes/NPCHistoria.tscn" id="2_historia"]
+[ext_resource type="PackedScene" uid="uid://matematica_npc" path="res://scenes/NPCMatematica.tscn" id="2_matematica"]
+[ext_resource type="PackedScene" uid="uid://diretor_npc" path="res://scenes/NPCDiretor.tscn" id="2_diretor"]
 [ext_resource type="PackedScene" uid="uid://b845phpfkqaak" path="res://kenney_modular-dungeon-kit_1/Models/GLB format/room-small.glb" id="3_room_small"]
 [ext_resource type="PackedScene" uid="uid://cxf1foop3nxlg" path="res://kenney_modular-dungeon-kit_1/Models/GLB format/room-large.glb" id="4_room_large"]
 [ext_resource type="PackedScene" uid="uid://cn2ugckfl62wj" path="res://kenney_modular-dungeon-kit_1/Models/GLB format/gate-door.glb" id="6_gate_door"]
@@ -197,7 +199,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000430107, 0, 0.226422)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.960415, 0)
 shape = SubResource("BoxShape3D_wall")
 
-[node name="NPCMatematica" parent="Room4" instance=ExtResource("2_male")]
+[node name="NPCMatematica" parent="Room4" instance=ExtResource("2_matematica")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.01672, -0.0499992, -1.62051)
 npc_name = "Prof. Bruno"
 subject = "Matemática"
@@ -352,7 +354,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.000430107, 0, 0.226422)
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.960415, 0)
 shape = SubResource("BoxShape3D_wall")
 
-[node name="NPCDiretor" parent="Room8" instance=ExtResource("2_old")]
+[node name="NPCDiretor" parent="Room8" instance=ExtResource("2_diretor")]
 transform = Transform3D(0.999917, 0, 0.0129151, 0, 1, 0, -0.0129151, 0, 0.999917, 5.27485, 0, -4.47697)
 npc_name = "Dir. Oliveira"
 subject = "Revisão Geral"
