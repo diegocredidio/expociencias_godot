@@ -688,8 +688,8 @@ layout_mode = 2
 theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
 theme_override_font_sizes/normal_font_size = 28
-text = "Você esgotou suas tentativas nesta pergunta. Mas não desista! O conhecimento se constrói com persistência e prática."
 bbcode_enabled = true
+text = "Você esgotou suas tentativas nesta pergunta. Mas não desista! O conhecimento se constrói com persistência e prática."
 fit_content = true
 scroll_active = false
 
@@ -756,8 +756,8 @@ layout_mode = 2
 theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
 theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
 theme_override_font_sizes/normal_font_size = 28
-text = "Você completou com sucesso todos os desafios da Expo Ciências! Seu conhecimento e dedicação te levaram à vitória!"
 bbcode_enabled = true
+text = "Você completou com sucesso todos os desafios da Expo Ciências! Seu conhecimento e dedicação te levaram à vitória!"
 fit_content = true
 scroll_active = false
 

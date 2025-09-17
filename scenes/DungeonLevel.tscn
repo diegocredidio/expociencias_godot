@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://c4k5pqrhag5nd"]
+[gd_scene load_steps=27 format=3 uid="uid://c4k5pqrhag5nd"]
 
 [ext_resource type="Script" uid="uid://xg28pt6og6kg" path="res://scripts/DungeonLevel.gd" id="1_2gd5k"]
 [ext_resource type="PackedScene" uid="uid://bd3qtmr2tnl7d" path="res://scenes/NPC.tscn" id="2_8bkgm"]
@@ -10,6 +10,18 @@
 [ext_resource type="PackedScene" uid="uid://p36v6jnaadcx" path="res://kenney_modular-dungeon-kit_1/Models/GLB format/template-wall.glb" id="7_wall"]
 [ext_resource type="PackedScene" uid="uid://cl7j4meg8y8ou" path="res://kenney_modular-dungeon-kit_1/Models/GLB format/room-wide.glb" id="10_cabpm"]
 [ext_resource type="PackedScene" uid="uid://outfswl7wiir" path="res://kenney_modular-dungeon-kit_1/Models/GLB format/room-large-variation.glb" id="10_udr20"]
+[ext_resource type="PackedScene" uid="uid://bbr5uijaumgr6" path="res://kenney_mini-characters/Models/GLB format/character-female-a.glb" id="12_i35j1"]
+[ext_resource type="PackedScene" uid="uid://mvjor0vipapd" path="res://kenney_mini-characters/Models/GLB format/character-female-b.glb" id="13_u7gqd"]
+[ext_resource type="PackedScene" uid="uid://cbga8k7bc4j36" path="res://kenney_mini-characters/Models/GLB format/character-female-c.glb" id="14_uw3sn"]
+[ext_resource type="PackedScene" uid="uid://dqarpun6ip1pm" path="res://kenney_mini-characters/Models/GLB format/character-female-d.glb" id="15_35sjm"]
+[ext_resource type="PackedScene" uid="uid://cjyhcdod6kuwa" path="res://kenney_mini-characters/Models/GLB format/character-female-e.glb" id="16_l5c6j"]
+[ext_resource type="PackedScene" uid="uid://cveebjfebns2m" path="res://kenney_mini-characters/Models/GLB format/character-female-f.glb" id="17_j8sut"]
+[ext_resource type="PackedScene" uid="uid://b6stnvxhhdaoy" path="res://kenney_mini-characters/Models/GLB format/character-male-a.glb" id="18_7xeh1"]
+[ext_resource type="PackedScene" uid="uid://ubkn8phg2e8p" path="res://kenney_mini-characters/Models/GLB format/character-male-b.glb" id="19_vxgt2"]
+[ext_resource type="PackedScene" uid="uid://cqvmuontms4c5" path="res://kenney_mini-characters/Models/GLB format/character-male-c.glb" id="20_ssanu"]
+[ext_resource type="PackedScene" uid="uid://b5oh331qyq5ch" path="res://kenney_mini-characters/Models/GLB format/character-male-d.glb" id="21_ybux8"]
+[ext_resource type="PackedScene" uid="uid://bnh2g5r5c2tqi" path="res://kenney_mini-characters/Models/GLB format/character-male-e.glb" id="22_gvfv4"]
+[ext_resource type="PackedScene" uid="uid://d1ax6non6i8ms" path="res://kenney_mini-characters/Models/GLB format/character-male-f.glb" id="23_ldgef"]
 [ext_resource type="Script" uid="uid://bf0koldgsujgw" path="res://scripts/NewDoor.gd" id="new_door_script"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_continuous_floor"]
@@ -342,3 +354,39 @@ transform = Transform3D(0.999917, 0, 0.0129151, 0, 1, 0, -0.0129151, 0, 0.999917
 npc_name = "Dir. Oliveira"
 subject = "Revisão Geral"
 greeting_message = "Parabéns por chegar até aqui! Sou o Diretor Oliveira e farei uma revisão geral dos conhecimentos!"
+
+[node name="character-female-a2" parent="." instance=ExtResource("12_i35j1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-female-b2" parent="." instance=ExtResource("13_u7gqd")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-female-c2" parent="." instance=ExtResource("14_uw3sn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-female-d2" parent="." instance=ExtResource("15_35sjm")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-female-e2" parent="." instance=ExtResource("16_l5c6j")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-female-f2" parent="." instance=ExtResource("17_j8sut")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-male-a2" parent="." instance=ExtResource("18_7xeh1")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-male-b2" parent="." instance=ExtResource("19_vxgt2")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-male-c2" parent="." instance=ExtResource("20_ssanu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-male-d2" parent="." instance=ExtResource("21_ybux8")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-male-e2" parent="." instance=ExtResource("22_gvfv4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)
+
+[node name="character-male-f2" parent="." instance=ExtResource("23_ldgef")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.1133, 9.53674e-07, -10.3938)

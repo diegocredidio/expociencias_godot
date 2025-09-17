@@ -1,7 +1,7 @@
 [gd_scene load_steps=4 format=3 uid="uid://bd3qtmr2tnl7d"]
 
 [ext_resource type="Script" uid="uid://dsgbd5wbnbk1q" path="res://scripts/NPC.gd" id="1_h37mr"]
-[ext_resource type="PackedScene" uid="uid://mvjor0vipapd" path="res://kenney_mini-characters/Models/GLB format/character-female-b.glb" id="2_npc_model"]
+[ext_resource type="PackedScene" uid="uid://mvjor0vipapd" path="res://kenney_mini-characters/Models/GLB format/character-female-a2.glb" id="2_npc_model"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_1hc0d"]
 height = 1.6
