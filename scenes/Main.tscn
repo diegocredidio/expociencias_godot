@@ -402,3 +402,163 @@ bbcode_enabled = true
 text = "Feedback da resposta..."
 fit_content = true
 scroll_active = false
+
+[node name="IncorrectFeedbackDialog" type="Panel" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.2
+anchor_right = 0.85
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("ChatDialogStyle")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/IncorrectFeedbackDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="ErrorIcon" type="Label" parent="UI/IncorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 80
+text = "❌"
+horizontal_alignment = 1
+
+[node name="ErrorTitle" type="Label" parent="UI/IncorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 40
+text = "Resposta Incorreta!"
+horizontal_alignment = 1
+
+[node name="AttemptInfo" type="Label" parent="UI/IncorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.965, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 28
+text = "Tentativa 1 de 3"
+horizontal_alignment = 1
+
+[node name="FeedbackContent" type="RichTextLabel" parent="UI/IncorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
+theme_override_fonts/bold_font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/normal_font_size = 28
+theme_override_styles/normal = SubResource("ChatHistoryStyle")
+bbcode_enabled = true
+text = "Feedback do erro será exibido aqui..."
+fit_content = true
+scroll_active = false
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/IncorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Spacer" type="Control" parent="UI/IncorrectFeedbackDialog/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="TryAgainButton" type="Button" parent="UI/IncorrectFeedbackDialog/VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
+text = "Tentar Novamente"
+
+[node name="Spacer2" type="Control" parent="UI/IncorrectFeedbackDialog/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CorrectFeedbackDialog" type="Panel" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.15
+anchor_top = 0.2
+anchor_right = 0.85
+anchor_bottom = 0.8
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("ChatDialogStyle")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/CorrectFeedbackDialog"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="SuccessIcon" type="Label" parent="UI/CorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 1, 0.3, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 80
+text = "✅"
+horizontal_alignment = 1
+
+[node name="SuccessTitle" type="Label" parent="UI/CorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.4, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 40
+text = "Parabéns! Você Acertou!"
+horizontal_alignment = 1
+
+[node name="FeedbackContent" type="RichTextLabel" parent="UI/CorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
+theme_override_fonts/bold_font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/normal_font_size = 28
+theme_override_styles/normal = SubResource("ChatHistoryStyle")
+bbcode_enabled = true
+text = "Explicação da resposta correta será exibida aqui..."
+fit_content = true
+scroll_active = false
+
+[node name="ButtonContainer" type="HBoxContainer" parent="UI/CorrectFeedbackDialog/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Spacer" type="Control" parent="UI/CorrectFeedbackDialog/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="UI/CorrectFeedbackDialog/VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(200, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
+text = "Concluir"
+
+[node name="Spacer2" type="Control" parent="UI/CorrectFeedbackDialog/VBoxContainer/ButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 3

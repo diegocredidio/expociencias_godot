@@ -28,6 +28,16 @@ extends Node3D
 @onready var score_display = $UI/QuizDialog/VBoxContainer/ScoreDisplay
 @onready var feedback_text = $UI/QuizDialog/VBoxContainer/FeedbackText
 
+# Feedback Dialog elements
+@onready var incorrect_feedback_dialog = $UI/IncorrectFeedbackDialog
+@onready var incorrect_attempt_info = $UI/IncorrectFeedbackDialog/VBoxContainer/AttemptInfo
+@onready var incorrect_feedback_content = $UI/IncorrectFeedbackDialog/VBoxContainer/FeedbackContent
+@onready var try_again_button = $UI/IncorrectFeedbackDialog/VBoxContainer/ButtonContainer/TryAgainButton
+
+@onready var correct_feedback_dialog = $UI/CorrectFeedbackDialog
+@onready var correct_feedback_content = $UI/CorrectFeedbackDialog/VBoxContainer/FeedbackContent
+@onready var close_feedback_button = $UI/CorrectFeedbackDialog/VBoxContainer/ButtonContainer/CloseButton
+
 # AI Question Builder
 var ai_question_builder: AIQuestionBuilder
 
@@ -149,6 +159,10 @@ func _ready():
 	quiz_option_b.pressed.connect(func(): _on_quiz_option_selected(1))
 	quiz_option_c.pressed.connect(func(): _on_quiz_option_selected(2))
 	quiz_option_d.pressed.connect(func(): _on_quiz_option_selected(3))
+	
+	# Connect feedback dialog buttons
+	try_again_button.pressed.connect(_on_try_again_button_pressed)
+	close_feedback_button.pressed.connect(_on_close_feedback_button_pressed)
 	
 	# Start in fullscreen
 	DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
@@ -671,60 +685,15 @@ func _on_quiz_option_selected(option_index: int):
 	quiz_option_d.disabled = true
 	
 	if option_index == correct_answer_index:
-		# Correct answer
-		print("🎉 RESPOSTA CORRETA! Iniciando desbloqueio...")
-		quiz_question.text += "\n\n[color=green][b]🎉 PARABÉNS! Resposta correta![/b][/color]"
-		
-		# Mostrar explicação se disponível
-		if current_quiz_data.has("rationale") and current_quiz_data.rationale != "":
-			quiz_question.text += "\n\n[color=lightblue][b]💡 Explicação:[/b] " + current_quiz_data.rationale + "[/color]"
-		
-		quiz_question.text += "\n[color=gold][b]🎉 PORTA DESBLOQUEADA![/b][/color]"
-		quiz_question.text += "\n[color=cyan][b]🚪 A porta está se abrindo...[/b][/color]"
-		
-		# Aguardar 3 segundos para o jogador ler as mensagens
-		await get_tree().create_timer(3.0).timeout
-		
-		# Fechar chat primeiro
-		close_chat()
-		
-		# Aguardar 1 segundo antes de iniciar efeito mágico e abrir porta
-		await get_tree().create_timer(1.0).timeout
-		
-		# Unlock room and door (com efeito mágico)
-		print("🚪 Chamando unlock_room_by_npc_name para: ", current_npc_name)
-		unlock_room_by_npc_name(current_npc_name)
-		
-		# Show success message
-		show_success_message()
+		# Correct answer - show success feedback screen
+		print("🎉 RESPOSTA CORRETA! Mostrando tela de sucesso...")
+		show_correct_feedback()
 	else:
-		# Wrong answer
+		# Wrong answer - show error feedback screen
 		npc_attempt_counts[current_npc_name] = npc_attempt_counts.get(current_npc_name, 0) + 1
 		var current_attempts = npc_attempt_counts[current_npc_name]
-		
-		# Update attempt counter display
-		update_attempt_counter(current_npc_name)
-		
-		# Show wrong answer animation
-		show_wrong_answer_animation()
-		
-		quiz_question.text += "\n\n[color=red][b]Resposta incorreta![/b][/color]"
-		quiz_question.text += "\n[color=#00f6ff]A resposta correta era: " + get_correct_option_text() + "[/color]"
-		
-		# Mostrar explicação se disponível
-		if current_quiz_data.has("rationale") and current_quiz_data.rationale != "":
-			quiz_question.text += "\n\n[color=lightblue][b]💡 Explicação:[/b] " + current_quiz_data.rationale + "[/color]"
-		
-		if current_attempts >= 3:
-			quiz_question.text += "\n[color=red][b]📝 Você já tentou 3 vezes.[/b][/color]"
-			quiz_question.text += "\n[color=yellow][b]💡 Sugestão: Estude mais sobre " + current_npc_subject + " e volte depois![/b][/color]"
-		else:
-			quiz_question.text += "\n[color=#00f6ff][b]🔄 Gerando nova pergunta...[/b][/color]"
-			
-			# Wait a bit then generate new question
-			await get_tree().create_timer(2.0).timeout
-			if current_npc_name != "":
-				generate_quiz_question_for_npc(null)
+		print("❌ RESPOSTA INCORRETA! Tentativa: ", current_attempts, "/3")
+		show_incorrect_feedback(current_attempts)
 
 func get_correct_option_text() -> String:
 	var button_texts = [quiz_option_a.text, quiz_option_b.text, quiz_option_c.text, quiz_option_d.text]
@@ -2132,3 +2101,96 @@ func _on_question_timeout():
 			chat_history.text += "\n[color=orange][b]⏰ Timeout:[/b] OpenAI demorou muito. Feche o chat e tente outro professor.[/color]"
 	else:
 		print("⏰ Timer expirado mas não aplicável - ignorando")
+
+# === NOVAS FUNÇÕES DE FEEDBACK ===
+
+func show_correct_feedback():
+	# Esconder quiz dialog
+	quiz_dialog.visible = false
+	
+	# Preparar conteúdo do feedback de sucesso
+	var feedback_text = "[b]Excelente! Você acertou a pergunta![/b]\n\n"
+	feedback_text += "[color=lightblue][b]💡 Explicação:[/b][/color]\n"
+	
+	if current_quiz_data.has("rationale") and current_quiz_data.rationale != "":
+		feedback_text += current_quiz_data.rationale
+	else:
+		feedback_text += "Parabéns! Você demonstrou conhecimento sobre o assunto."
+	
+	feedback_text += "\n\n[color=gold][b]🎉 PORTA DESBLOQUEADA![/b][/color]"
+	feedback_text += "\n[color=cyan][b]🚪 A porta está se abrindo...[/b][/color]"
+	
+	correct_feedback_content.text = feedback_text
+	
+	# Mostrar dialog de feedback correto
+	correct_feedback_dialog.visible = true
+
+func show_incorrect_feedback(attempts: int):
+	# Esconder quiz dialog  
+	quiz_dialog.visible = false
+	
+	# Atualizar info de tentativas
+	incorrect_attempt_info.text = "Tentativa " + str(attempts) + " de 3"
+	
+	# Preparar conteúdo do feedback de erro
+	var feedback_text = "[color=red][b]Resposta incorreta![/b][/color]\n\n"
+	feedback_text += "[color=#00f6ff]A resposta correta era: " + get_correct_option_text() + "[/color]\n\n"
+	
+	if current_quiz_data.has("rationale") and current_quiz_data.rationale != "":
+		feedback_text += "[color=lightblue][b]💡 Explicação:[/b][/color]\n"
+		feedback_text += current_quiz_data.rationale
+	else:
+		feedback_text += "[color=yellow]Estude mais sobre este tópico e tente novamente![/color]"
+	
+	incorrect_feedback_content.text = feedback_text
+	
+	# Configurar botão baseado no número de tentativas
+	if attempts >= 3:
+		try_again_button.text = "Máximo de Tentativas Atingido"
+		try_again_button.disabled = true
+	else:
+		try_again_button.text = "Tentar Novamente"
+		try_again_button.disabled = false
+	
+	# Mostrar dialog de feedback incorreto
+	incorrect_feedback_dialog.visible = true
+
+func _on_try_again_button_pressed():
+	print("🔄 Gerando nova pergunta...")
+	
+	# Esconder feedback dialog
+	incorrect_feedback_dialog.visible = false
+	
+	# Mostrar quiz dialog novamente
+	quiz_dialog.visible = true
+	
+	# Reset quiz buttons
+	reset_quiz_buttons()
+	enable_quiz_buttons()
+	
+	# Update attempt counter in quiz dialog
+	update_attempt_counter(current_npc_name)
+	
+	# Aguardar um momento e gerar nova pergunta
+	await get_tree().create_timer(0.5).timeout
+	if current_npc_name != "":
+		generate_quiz_question_for_npc(null)
+
+func _on_close_feedback_button_pressed():
+	print("🎉 Fechando feedback de sucesso e desbloqueando porta...")
+	
+	# Esconder feedback dialog
+	correct_feedback_dialog.visible = false
+	
+	# Fechar chat completamente
+	close_chat()
+	
+	# Aguardar 1 segundo antes de iniciar efeito mágico e abrir porta
+	await get_tree().create_timer(1.0).timeout
+	
+	# Unlock room and door (com efeito mágico)
+	print("🚪 Chamando unlock_room_by_npc_name para: ", current_npc_name)
+	unlock_room_by_npc_name(current_npc_name)
+	
+	# Show success message
+	show_success_message()
