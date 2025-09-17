@@ -671,6 +671,7 @@ func enable_quiz_buttons():
 	quiz_option_b.disabled = false
 	quiz_option_c.disabled = false
 	quiz_option_d.disabled = false
+	print("🔓 Botões do quiz habilitados (enable_quiz_buttons)")
 
 func _on_quiz_option_selected(option_index: int):
 	print("📝 === QUIZ OPTION SELECTED ===")
@@ -678,11 +679,8 @@ func _on_quiz_option_selected(option_index: int):
 	print("📝 NPC atual: ", current_npc_name)
 	print("📝 Resposta correta? ", option_index == correct_answer_index)
 	
-	# Disable all buttons to prevent multiple selections
-	quiz_option_a.disabled = true
-	quiz_option_b.disabled = true
-	quiz_option_c.disabled = true
-	quiz_option_d.disabled = true
+	# Disable all buttons IMMEDIATELY to prevent multiple selections or accidental clicks
+	disable_all_quiz_buttons()
 	
 	if option_index == correct_answer_index:
 		# Correct answer - show success feedback screen
@@ -2105,6 +2103,9 @@ func _on_question_timeout():
 # === NOVAS FUNÇÕES DE FEEDBACK ===
 
 func show_correct_feedback():
+	# Desabilitar completamente os botões do quiz para evitar cliques acidentais
+	disable_all_quiz_buttons()
+	
 	# Esconder quiz dialog
 	quiz_dialog.visible = false
 	
@@ -2124,8 +2125,15 @@ func show_correct_feedback():
 	
 	# Mostrar dialog de feedback correto
 	correct_feedback_dialog.visible = true
+	
+	# Garantir que botões permaneçam desabilitados enquanto feedback está visível
+	await get_tree().process_frame
+	disable_all_quiz_buttons()
 
 func show_incorrect_feedback(attempts: int):
+	# Desabilitar completamente os botões do quiz para evitar cliques acidentais
+	disable_all_quiz_buttons()
+	
 	# Esconder quiz dialog  
 	quiz_dialog.visible = false
 	
@@ -2154,6 +2162,10 @@ func show_incorrect_feedback(attempts: int):
 	
 	# Mostrar dialog de feedback incorreto
 	incorrect_feedback_dialog.visible = true
+	
+	# Garantir que botões permaneçam desabilitados enquanto feedback está visível
+	await get_tree().process_frame
+	disable_all_quiz_buttons()
 
 func _on_try_again_button_pressed():
 	print("🔄 Gerando nova pergunta...")
@@ -2161,15 +2173,18 @@ func _on_try_again_button_pressed():
 	# Esconder feedback dialog
 	incorrect_feedback_dialog.visible = false
 	
-	# Mostrar quiz dialog novamente
+	# Mostrar quiz dialog novamente, mas ainda com botões desabilitados
 	quiz_dialog.visible = true
-	
-	# Reset quiz buttons
-	reset_quiz_buttons()
-	enable_quiz_buttons()
 	
 	# Update attempt counter in quiz dialog
 	update_attempt_counter(current_npc_name)
+	
+	# Mostrar mensagem de carregamento
+	quiz_question.text = "[color=cyan][b]🔄 Gerando nova pergunta...[/b][/color]"
+	
+	# Reset quiz buttons (ainda desabilitados)
+	reset_quiz_buttons()
+	# NÃO habilitar botões ainda - só quando a nova pergunta carregar
 	
 	# Aguardar um momento e gerar nova pergunta
 	await get_tree().create_timer(0.5).timeout
@@ -2194,3 +2209,21 @@ func _on_close_feedback_button_pressed():
 	
 	# Show success message
 	show_success_message()
+
+# === FUNÇÕES AUXILIARES PARA CONTROLE DE BOTÕES ===
+
+func disable_all_quiz_buttons():
+	"""Desabilita todos os botões do quiz para evitar cliques acidentais"""
+	quiz_option_a.disabled = true
+	quiz_option_b.disabled = true
+	quiz_option_c.disabled = true
+	quiz_option_d.disabled = true
+	print("🔒 Botões do quiz desabilitados")
+
+func ensure_quiz_buttons_enabled():
+	"""Garante que os botões do quiz estejam habilitados - com log para debug"""
+	quiz_option_a.disabled = false
+	quiz_option_b.disabled = false
+	quiz_option_c.disabled = false
+	quiz_option_d.disabled = false
+	print("🔓 Botões do quiz habilitados")
