@@ -508,7 +508,7 @@ func open_quiz_interface(chat_npc):
 	update_professor_info(chat_npc.npc_name, chat_npc.subject)
 	
 	# Verificar se é o diretor (pergunta aberta)
-	var is_director = chat_npc.npc_name == "Diretor Oliveira"
+	var is_director = chat_npc.npc_name == "Dir. Oliveira"
 	
 	if is_director:
 		open_open_question_mode(chat_npc)
@@ -575,6 +575,16 @@ func generate_open_question_for_npc(chat_npc):
 	current_npc_name = chat_npc.npc_name
 	current_npc_subject = "multidisciplinar"
 	
+	# Atualizar contador de tentativas na UI
+	update_attempt_counter(chat_npc.npc_name)
+	
+	# Limpar campos para nova pergunta
+	answer_input.text = ""
+	answer_input.editable = true
+	submit_button.disabled = false
+	score_display.visible = false
+	feedback_text.visible = false
+	
 	# Gerar prompt de variedade para perguntas abertas
 	var topic_variety_prompt = get_open_question_variety_prompt(chat_npc.npc_name, npc_attempt_counts.get(chat_npc.npc_name, 0))
 	
@@ -619,13 +629,30 @@ func _on_open_question_submit_pressed():
 	# Incrementar tentativas
 	var npc_name = current_npc_name
 	npc_attempt_counts[npc_name] = npc_attempt_counts.get(npc_name, 0) + 1
+	var current_attempts = npc_attempt_counts[npc_name]
 	
-	# Verificar se ainda há tentativas restantes
-	var remaining_attempts = 3 - npc_attempt_counts[npc_name]
-	if remaining_attempts > 0 and not validation_result.is_correct:
-		# Preparar para próxima tentativa
-		await get_tree().create_timer(3.0).timeout
-		generate_open_question_for_npc(current_npc)
+	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
+	
+	# Para o diretor, verificar se precisa de novas tentativas
+	if npc_name == "Dir. Oliveira":
+		# Se não conseguiu 70% e ainda tem tentativas
+		var score_real = validation_result.score
+		if score_real < 60 and current_attempts < 3:  # Menos de 60% real = fracasso
+			print("⚠️ Diretor não alcançou pontuação mínima. Tentando novamente...")
+			# Aguardar feedback, então mostrar nova pergunta
+			await get_tree().create_timer(5.0).timeout
+			generate_open_question_for_npc(current_npc)
+		elif score_real < 60 and current_attempts >= 3:
+			print("💀 Diretor falhou nas 3 tentativas - Game Over")
+			await get_tree().create_timer(3.0).timeout
+			show_game_over_screen()
+		# Se conseguiu 60%+ (que aparece como 70%+), vitória já foi tratada em display_open_question_result
+	else:
+		# Lógica original para outros NPCs
+		var remaining_attempts = 3 - current_attempts
+		if remaining_attempts > 0 and not validation_result.is_correct:
+			await get_tree().create_timer(3.0).timeout
+			generate_open_question_for_npc(current_npc)
 
 # Função para exibir resultado da pergunta aberta
 func display_open_question_result(validation_result: Dictionary):
@@ -633,8 +660,19 @@ func display_open_question_result(validation_result: Dictionary):
 	answer_input.editable = false
 	submit_button.disabled = true
 	
-	# Exibir pontuação (mais generosa - mostrar 10% a menos)
-	var displayed_score = max(0, validation_result.score - 10)
+	# Lógica especial para o diretor: boost de pontuação para motivar
+	var displayed_score = validation_result.score
+	if current_npc_name == "Dir. Oliveira":
+		# Se conseguiu 60% ou mais, mostrar 70% (boost motivacional)
+		if validation_result.score >= 60:
+			displayed_score = max(70, validation_result.score)
+		# Se conseguiu menos de 60%, mostrar score real
+		else:
+			displayed_score = validation_result.score
+	else:
+		# Para outros NPCs, mostrar score normal (menos 10% como antes)
+		displayed_score = max(0, validation_result.score - 10)
+	
 	score_display.text = "Pontuação: " + str(int(displayed_score)) + "%"
 	score_display.visible = true
 	
@@ -652,12 +690,14 @@ func display_open_question_result(validation_result: Dictionary):
 	feedback_text.text = feedback_text_content
 	feedback_text.visible = true
 	
-	# Verificar se é o diretor e se a resposta está correta (vitória!)
-	if current_npc_name == "Diretor Oliveira" and validation_result.is_correct:
-		print("🏆 VITÓRIA! Diretor respondeu corretamente!")
+	# Verificar se é o diretor e se alcançou 70% (vitória!)
+	if current_npc_name == "Dir. Oliveira" and displayed_score >= 70:
+		print("🏆 VITÓRIA! Diretor alcançou ", displayed_score, "% - conquistou a vitória!")
 		# Aguardar 3 segundos para o jogador ler o feedback, então mostrar tela de vitória
 		await get_tree().create_timer(3.0).timeout
 		show_victory_screen()
+	elif current_npc_name == "Dir. Oliveira" and displayed_score < 70:
+		print("⚠️ Diretor ainda não alcançou 70%. Score atual: ", displayed_score, "%")
 	
 	print("✅ Resultado da pergunta aberta exibido!")
 
@@ -1731,8 +1771,8 @@ func _on_answer_evaluated(_result: int, response_code: int, _headers: PackedStri
 			# Extract percentage and validate (70% minimum for approval)
 			var percentage = extract_percentage(evaluation_result)
 			if percentage >= 70:
-				# Student got it right! Unlock the room
-				unlock_room_by_npc_name(current_npc_name)
+				# Student got it right! Unlock the door using NEW system
+				unlock_doors_for_npc(current_npc_name)
 				chat_history.text += "\n[color=gold][b]🎉 PORTA DESBLOQUEADA![/b][/color]"
 				chat_history.text += "\n[color=cyan][b]Você pode fechar o chat e prosseguir para a próxima sala![/b][/color]"
 			else:
@@ -2337,9 +2377,9 @@ func _on_close_feedback_button_pressed():
 	# Aguardar 1 segundo antes de iniciar efeito mágico e abrir porta
 	await get_tree().create_timer(1.0).timeout
 	
-	# Unlock room and door (com efeito mágico)
-	print("🚪 Chamando unlock_room_by_npc_name para: ", current_npc_name)
-	unlock_room_by_npc_name(current_npc_name)
+	# Unlock door using NEW system (by NPC name)
+	print("🚪 Chamando unlock_doors_for_npc para: ", current_npc_name)
+	unlock_doors_for_npc(current_npc_name)
 	
 	# Show success message
 	show_success_message()

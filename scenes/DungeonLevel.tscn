@@ -137,7 +137,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -0.160712)
 transform = Transform3D(0.999999, 0, 0.00137885, 0, 1, 0, -0.00137885, 0, 0.999999, 15.1804, 0, -9.66077)
 script = ExtResource("new_door_script")
 door_name = "matematica_door"
-unlocks_when_npc_completes = "Prof. Makson"
+unlocks_when_npc_completes = "Prof. Mackson"
 
 [node name="DoorMesh" parent="CienciasDoor" instance=ExtResource("6_gate_door")]
 
@@ -148,9 +148,9 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.2351, 0, 0)
 
 [node name="NPCCiencias" parent="Room3_big" instance=ExtResource("2_male")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.08014, 0, -3.54041)
-npc_name = "Prof. Makson"
+npc_name = "Prof. Mackson"
 subject = "Ciências"
-greeting_message = "Olá! Sou o Professor Makson e ensino Ciências da Natureza para o 6º ano!"
+greeting_message = "Olá! Sou o Professor Mackson e ensino Ciências da Natureza para o 6º ano!"
 room_id = "ciencias_room"
 unlocks_room = "matematica_room"
 quiz_mode = "pergunta_multipla_escolha"
@@ -239,7 +239,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.960415, 0)
 shape = SubResource("BoxShape3D_wall")
 
 [node name="NPCGeografia" parent="Room5" instance=ExtResource("2_geografia")]
-transform = Transform3D(-0.0138226, 0, 0.999905, 0, 1, 0, -0.999905, 0, -0.0138226, -2.00757, 0, 2.53815)
+transform = Transform3D(-0.0138226, 0, 0.999905, 0, 1, 0, -0.999905, 0, -0.0138226, -3.91939, 0, 2.53989)
 npc_name = "Profa. Amanda"
 greeting_message = "Olá! Sou a Professora Amanda e ensino Geografia para o 6º ano!"
 room_id = "geografia_room"
