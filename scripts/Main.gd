@@ -80,6 +80,10 @@ var registered_doors = {} # Armazenar portas por nome
 var game_started = false
 var pulse_tween: Tween
 
+# Responsive scaling
+var base_scale = Vector2(0.351266, 0.351266)
+var base_window_size = Vector2(1152, 648)  # Tamanho de referência
+
 # Nova função para fazer requisições via proxy Supabase
 func call_supabase_proxy(prompt: String, subject: String = "Educação", quiz_mode: String = "pergunta_aberta") -> String:
 	var http_request = HTTPRequest.new()
@@ -152,9 +156,16 @@ func _ready():
 	start_button.pressed.connect(_on_start_button_pressed)
 	print("🚀 Sinal do botão INICIAR conectado")
 	
+	# Conectar sinal de redimensionamento da janela
+	get_viewport().size_changed.connect(_on_viewport_size_changed)
+	print("📐 Sinal de redimensionamento conectado")
+	
 	# Adicionar ao grupo main para portas se registrarem
 	add_to_group("main")
 	print("🚪 Main.gd adicionado ao grupo 'main'")
+	
+	# Configurar escala responsiva inicial
+	_on_viewport_size_changed()
 	
 	# Mostrar tela de abertura
 	initialize_start_screen()
@@ -2315,6 +2326,12 @@ func start_bounce_animation():
 	if pulse_tween:
 		pulse_tween.kill()
 	
+	# Calcular escala responsiva atual
+	var current_size = get_viewport().size
+	var scale_factor = min(current_size.x / base_window_size.x, current_size.y / base_window_size.y)
+	scale_factor = clamp(scale_factor, 0.3, 2.0)
+	var target_scale = base_scale * scale_factor
+	
 	# Começar com a imagem pequena
 	title_sprite.scale = Vector2(0.0, 0.0)
 	
@@ -2322,14 +2339,30 @@ func start_bounce_animation():
 	pulse_tween.set_ease(Tween.EASE_OUT)
 	pulse_tween.set_trans(Tween.TRANS_BACK)
 	
-	# Animação de bounce: 0 -> escala original com efeito back (bounce)
-	pulse_tween.tween_property(title_sprite, "scale", Vector2(0.351266, 0.351266), 0.8)
+	# Animação de bounce: 0 -> escala responsiva com efeito back (bounce)
+	pulse_tween.tween_property(title_sprite, "scale", target_scale, 0.8)
 	
-	print("🎾 Animação de bounce iniciada")
+	print("🎾 Animação de bounce iniciada com escala: ", target_scale)
 
 func set_title_scale(scale_value: float):
 	"""Define a escala da imagem do título"""
 	title_sprite.scale = Vector2(scale_value, scale_value)
+
+func _on_viewport_size_changed():
+	"""Ajusta a escala da imagem quando a janela é redimensionada"""
+	if not title_sprite:
+		return
+		
+	var current_size = get_viewport().size
+	var scale_factor = min(current_size.x / base_window_size.x, current_size.y / base_window_size.y)
+	
+	# Limitar o fator de escala para evitar que fique muito pequeno ou muito grande
+	scale_factor = clamp(scale_factor, 0.3, 2.0)
+	
+	var new_scale = base_scale * scale_factor
+	title_sprite.scale = new_scale
+	
+	print("📐 Janela redimensionada: ", current_size, " | Fator: ", scale_factor, " | Nova escala: ", new_scale)
 
 func show_start_button():
 	"""Mostra o botão de iniciar com fade-in"""
