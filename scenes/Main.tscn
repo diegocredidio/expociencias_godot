@@ -635,3 +635,139 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "INICIAR"
+
+[node name="GameOverScreen" type="Panel" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="UI/GameOverScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/GameOverScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/GameOverScreen/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="GameOverIcon" type="Label" parent="UI/GameOverScreen/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.3, 0.3, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 120
+text = "😢"
+horizontal_alignment = 1
+
+[node name="GameOverTitle" type="Label" parent="UI/GameOverScreen/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.4, 0.4, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 48
+text = "Não foi dessa vez!"
+horizontal_alignment = 1
+
+[node name="GameOverMessage" type="RichTextLabel" parent="UI/GameOverScreen/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(600, 120)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/normal_font_size = 28
+text = "Você esgotou suas tentativas nesta pergunta. Mas não desista! O conhecimento se constrói com persistência e prática."
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="RestartButton" type="Button" parent="UI/GameOverScreen/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(250, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
+text = "Jogar Novamente"
+
+[node name="VictoryScreen" type="Panel" parent="UI"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Background" type="ColorRect" parent="UI/VictoryScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+
+[node name="CenterContainer" type="CenterContainer" parent="UI/VictoryScreen"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/VictoryScreen/CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 40
+
+[node name="VictoryIcon" type="Label" parent="UI/VictoryScreen/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.8, 0, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 120
+text = "🏆"
+horizontal_alignment = 1
+
+[node name="VictoryTitle" type="Label" parent="UI/VictoryScreen/CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.4, 1, 0.4, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 48
+text = "Parabéns! Você Ganhou!"
+horizontal_alignment = 1
+
+[node name="VictoryMessage" type="RichTextLabel" parent="UI/VictoryScreen/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(600, 120)
+layout_mode = 2
+theme_override_colors/default_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/normal_font = ExtResource("4_barlow_regular")
+theme_override_font_sizes/normal_font_size = 28
+text = "Você completou com sucesso todos os desafios da Expo Ciências! Seu conhecimento e dedicação te levaram à vitória!"
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+
+[node name="PlayAgainButton" type="Button" parent="UI/VictoryScreen/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(250, 70)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 32
+theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
+theme_override_styles/normal = SubResource("QuizButtonStyle")
+text = "Jogar Novamente"

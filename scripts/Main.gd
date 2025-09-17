@@ -43,6 +43,14 @@ extends Node3D
 @onready var title_sprite = $"UI/StartScreen/TitleImageContainer/Expo-cienciasTitle"
 @onready var start_button = $UI/StartScreen/ButtonContainer/StartButton
 
+# Game Over Screen elements
+@onready var game_over_screen = $UI/GameOverScreen
+@onready var restart_button = $UI/GameOverScreen/CenterContainer/VBoxContainer/RestartButton
+
+# Victory Screen elements
+@onready var victory_screen = $UI/VictoryScreen
+@onready var play_again_button = $UI/VictoryScreen/CenterContainer/VBoxContainer/PlayAgainButton
+
 # AI Question Builder
 var ai_question_builder: AIQuestionBuilder
 
@@ -155,6 +163,11 @@ func _ready():
 	# Conectar sinal do botão iniciar
 	start_button.pressed.connect(_on_start_button_pressed)
 	print("🚀 Sinal do botão INICIAR conectado")
+	
+	# Conectar sinais dos botões de fim de jogo
+	restart_button.pressed.connect(_on_restart_game)
+	play_again_button.pressed.connect(_on_restart_game)
+	print("🔄 Sinais dos botões de reinício conectados")
 	
 	# Conectar sinal de redimensionamento da janela
 	get_viewport().size_changed.connect(_on_viewport_size_changed)
@@ -638,6 +651,13 @@ func display_open_question_result(validation_result: Dictionary):
 	
 	feedback_text.text = feedback_text_content
 	feedback_text.visible = true
+	
+	# Verificar se é o diretor e se a resposta está correta (vitória!)
+	if current_npc_name == "Diretor Oliveira" and validation_result.is_correct:
+		print("🏆 VITÓRIA! Diretor respondeu corretamente!")
+		# Aguardar 3 segundos para o jogador ler o feedback, então mostrar tela de vitória
+		await get_tree().create_timer(3.0).timeout
+		show_victory_screen()
 	
 	print("✅ Resultado da pergunta aberta exibido!")
 
@@ -2216,17 +2236,24 @@ func show_incorrect_feedback(attempts: int):
 	
 	# Configurar botão baseado no número de tentativas
 	if attempts >= 3:
+		# Máximo de tentativas atingido - mostrar tela de game over após 3 segundos
 		try_again_button.text = "Máximo de Tentativas Atingido"
 		try_again_button.disabled = true
+		
+		# Mostrar dialog de feedback de erro primeiro
+		incorrect_feedback_dialog.visible = true
+		
+		# Aguardar 3 segundos e então mostrar tela de game over
+		await get_tree().create_timer(3.0).timeout
+		show_game_over_screen()
 	else:
 		try_again_button.text = "Tentar Novamente"
 		try_again_button.disabled = false
-	
-	# Mostrar dialog de feedback incorreto
-	incorrect_feedback_dialog.visible = true
-	
-	# Garantir que botões permaneçam desabilitados enquanto feedback está visível
-	await get_tree().process_frame
+		# Mostrar dialog de feedback incorreto
+		incorrect_feedback_dialog.visible = true
+		
+		# Garantir que botões permaneçam desabilitados enquanto feedback está visível
+		await get_tree().process_frame
 	disable_all_quiz_buttons()
 
 func _on_try_again_button_pressed():
@@ -2425,3 +2452,53 @@ func create_title_placeholder():
 	
 	# title_image.texture = texture  # Comentado - usando Sprite2D agora
 	print("🖼️ Placeholder do título criado (branco)")
+
+# === FUNÇÕES DAS TELAS DE FIM DE JOGO ===
+
+func show_game_over_screen():
+	"""Mostra a tela de game over (derrota)"""
+	print("💀 Mostrando tela de Game Over...")
+	
+	# Esconder todas as outras telas
+	hide_all_ui()
+	
+	# Mostrar tela de game over
+	game_over_screen.visible = true
+	game_over_screen.modulate.a = 0.0
+	
+	# Fade in da tela
+	var fade_tween = create_tween()
+	fade_tween.tween_property(game_over_screen, "modulate:a", 1.0, 1.0)
+
+func show_victory_screen():
+	"""Mostra a tela de vitória"""
+	print("🏆 Mostrando tela de Vitória!")
+	
+	# Esconder todas as outras telas
+	hide_all_ui()
+	
+	# Mostrar tela de vitória
+	victory_screen.visible = true
+	victory_screen.modulate.a = 0.0
+	
+	# Fade in da tela
+	var fade_tween = create_tween()
+	fade_tween.tween_property(victory_screen, "modulate:a", 1.0, 1.0)
+
+func _on_restart_game():
+	"""Reinicia o jogo completamente"""
+	print("🔄 Reiniciando jogo...")
+	
+	# Recarregar a cena inteira
+	get_tree().reload_current_scene()
+
+func hide_all_ui():
+	"""Esconde todos os elementos da UI"""
+	start_screen.visible = false
+	chat_dialog.visible = false
+	quiz_dialog.visible = false
+	incorrect_feedback_dialog.visible = false
+	correct_feedback_dialog.visible = false
+	interaction_prompt.visible = false
+	game_over_screen.visible = false
+	victory_screen.visible = false
