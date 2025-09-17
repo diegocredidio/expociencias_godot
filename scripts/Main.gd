@@ -1154,7 +1154,12 @@ func create_quiz_prompt(npc) -> String:
 	
 	var base_prompt = "Professor(a) " + npc_name + " de " + npc_subject + " (6º ano). "
 	base_prompt += "IMPORTANTE: Gere UMA pergunta de múltipla escolha com 4 alternativas sobre " + npc_subject + ". "
-	base_prompt += "A pergunta deve ser específica e as alternativas devem estar relacionadas à pergunta. "
+	base_prompt += "REGRAS OBRIGATÓRIAS: "
+	base_prompt += "1) A pergunta deve ser OBJETIVA e ter apenas UMA resposta correta baseada em fatos/conhecimento científico "
+	base_prompt += "2) EVITE perguntas opinativas, subjetivas ou de preferência pessoal "
+	base_prompt += "3) Use conceitos, definições, classificações, processos ou dados concretos "
+	base_prompt += "4) As 3 alternativas incorretas devem ser distratores plausíveis mas claramente errados "
+	base_prompt += "5) A pergunta deve ser específica e as alternativas devem estar relacionadas à pergunta. "
 	
 	# Add topic variety system
 	var topic_variety_prompt = get_topic_variety_prompt(npc_name, npc_subject, attempt_count)
@@ -1167,6 +1172,8 @@ func create_quiz_prompt(npc) -> String:
 			base_prompt += "🔗 CONEXÕES E ESCALAS: Relações entre os componentes físico-naturais (formas de relevo, tempo atmosférico, clima, hidrografia, solos, vegetação); "
 			base_prompt += "💼 MUNDO DO TRABALHO: Transformação das paisagens naturais e antrópicas; diferentes tipos de trabalho no campo e na cidade; "
 			base_prompt += "🗺️ FORMAS DE REPRESENTAÇÃO: Fenômenos naturais e sociais representados de diferentes maneiras; leitura de mapas; escalas cartográficas. "
+			base_prompt += "EXEMPLOS OBJETIVOS GEOGRAFIA: 'Qual a principal característica do clima tropical?', 'Quantos continentes existem?', 'O que é um arquipélago?' "
+			base_prompt += "EVITE PERGUNTAS COMO: 'Que clima você gostaria de visitar?', 'Qual paisagem é mais bonita?', 'Onde você preferiria morar?' "
 		"Português":
 			base_prompt += "BNCC 6º ano LÍNGUA PORTUGUESA - TÓPICOS VARIADOS:\n"
 			base_prompt += "📖 LEITURA E INTERPRETAÇÃO: Textos narrativos (contos, fábulas), textos informativos, inferências, tema central, personagens, tempo e espaço; "
@@ -1176,24 +1183,32 @@ func create_quiz_prompt(npc) -> String:
 			base_prompt += "🔗 SINTAXE: Sujeito e predicado, concordância nominal básica, formação de frases; "
 			base_prompt += "📚 LITERATURA: Elementos da narrativa, diferença entre prosa e verso, rimas, figuras de linguagem simples (metáfora, comparação); "
 			base_prompt += "✍️ PRODUÇÃO TEXTUAL: Estrutura de parágrafos, coesão textual, tipos de texto (narrativo, descritivo, instrucional). "
+			base_prompt += "EXEMPLOS OBJETIVOS PORTUGUÊS: 'Qual é o plural de cidadão?', 'O que é um substantivo próprio?', 'Quantas sílabas tem a palavra computador?' "
+			base_prompt += "EVITE PERGUNTAS COMO: 'Qual livro você mais gosta?', 'Que tipo de texto prefere escrever?', 'Qual seu personagem favorito?' "
 		"Ciências":
 			base_prompt += "BNCC 6º ano CIÊNCIAS DA NATUREZA - UNIDADES TEMÁTICAS:\n"
 			base_prompt += "🔬 MATÉRIA E ENERGIA: Estados físicos da matéria e transformações; misturas e separação de materiais (filtração, decantação, destilação); fontes de energia (renováveis e não renováveis); usos da energia no cotidiano e impactos ambientais; luz, som, calor e eletricidade no dia a dia. "
 			base_prompt += "🌎 TERRA E UNIVERSO: Estrutura da Terra (camadas, relevo, rochas e minerais); movimentos da Terra (rotação e translação, estações do ano, dia e noite); fases da Lua e eclipses; Sistema Solar (planetas, asteroides, cometas); universo (galáxias, estrelas, distâncias astronômicas). "
 			base_prompt += "🧬 VIDA E EVOLUÇÃO: Características gerais dos seres vivos; diversidade da vida (plantas, animais, fungos, bactérias e protozoários); organização dos seres vivos (células, tecidos, órgãos e sistemas); reprodução (asexuada e sexuada); ciclos de vida e relações ecológicas (predação, competição, simbiose). "
 			base_prompt += "🧍 SER HUMANO E SAÚDE: Corpo humano (sistemas digestório, respiratório, circulatório, excretor); alimentação saudável, nutrientes e pirâmide alimentar; higiene pessoal e prevenção de doenças; doenças transmissíveis e não transmissíveis; vacinação, autocuidado e saúde coletiva. "
+			base_prompt += "EXEMPLOS OBJETIVOS CIÊNCIAS: 'Quantos estados físicos da matéria existem?', 'Qual sistema é responsável pela respiração?', 'Quantos planetas tem o Sistema Solar?' "
+			base_prompt += "EVITE PERGUNTAS COMO: 'Qual animal você mais gosta?', 'Que experiência seria mais interessante?', 'Qual planeta gostaria de visitar?' "
 		"Matemática":
 			base_prompt += "BNCC 6º ano MATEMÁTICA - UNIDADES TEMÁTICAS:\n"
 			base_prompt += "🔢 NÚMEROS: Operações com números naturais e decimais; frações e suas operações; porcentagem e proporcionalidade; "
 			base_prompt += "📐 GEOMETRIA: Figuras planas e espaciais; perímetro, área e volume; simetria e transformações geométricas; "
 			base_prompt += "📏 GRANDEZAS E MEDIDAS: Comprimento, massa, capacidade, tempo; conversões entre unidades; "
 			base_prompt += "📊 ESTATÍSTICA E PROBABILIDADE: Coleta e organização de dados; gráficos (colunas, barras, linhas); probabilidade simples. "
+			base_prompt += "EXEMPLOS OBJETIVOS MATEMÁTICA: 'Quanto é 2/3 + 1/4?', 'Quantos lados tem um hexágono?', 'Qual é o perímetro de um quadrado de lado 5cm?' "
+			base_prompt += "EVITE PERGUNTAS COMO: 'Qual operação matemática você acha mais fácil?', 'Que figura geométrica mais gosta?', 'Prefere números pares ou ímpares?' "
 		"História":
 			base_prompt += "BNCC 6º ano HISTÓRIA - UNIDADES TEMÁTICAS:\n"
 			base_prompt += "⏰ TEMPO HISTÓRICO: Cronologia e periodização; fontes históricas (escritas, orais, iconográficas); "
 			base_prompt += "👥 SOCIEDADE E CULTURA: Diversidade cultural; tradições e costumes; identidade e alteridade; "
 			base_prompt += "🔧 TRABALHO E TECNOLOGIA: Evolução das técnicas; impacto das tecnologias na sociedade; "
 			base_prompt += "🇧🇷 BRASIL: Formação do território brasileiro; diversidade regional; patrimônio histórico e cultural. "
+			base_prompt += "EXEMPLOS OBJETIVOS HISTÓRIA: 'Em que século ocorreu o descobrimento do Brasil?', 'Qual foi a primeira capital do Brasil?', 'Quantos períodos tem a Pré-História?' "
+			base_prompt += "EVITE PERGUNTAS COMO: 'Qual período histórico você gostaria de visitar?', 'Que civilização acha mais interessante?', 'Preferia viver na cidade ou no campo?' "
 		"Revisão Geral":
 			base_prompt += "BNCC 6º ano - REVISÃO INTERDISCIPLINAR:\n"
 			base_prompt += "📚 PORTUGUÊS: Leitura, escrita, oralidade e análise linguística; "
@@ -1436,6 +1451,8 @@ func create_question_prompt(npc) -> String:
 	
 	# Optimized shorter prompt for faster response
 	var base_prompt = "Professor(a) " + npc_name + " de " + npc_subject + " (6º ano). "
+	base_prompt += "IMPORTANTE: Gere apenas perguntas OBJETIVAS com respostas baseadas em fatos e conhecimento científico. "
+	base_prompt += "EVITE perguntas opinativas, subjetivas ou de preferência pessoal. "
 	
 	if attempt_count > 0:
 		base_prompt += "Nova pergunta, tópico diferente. "
