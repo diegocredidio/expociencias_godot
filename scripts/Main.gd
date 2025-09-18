@@ -51,6 +51,7 @@ extends Node3D
 # Victory Screen elements
 @onready var victory_screen = $UI/VictoryScreen
 @onready var play_again_button = $UI/VictoryScreen/CenterContainer/VBoxContainer/PlayAgainButton
+@onready var confetti_particles = $UI/VictoryScreen/ConfettiParticles
 
 # AI Question Builder
 var ai_question_builder: AIQuestionBuilder
@@ -240,6 +241,9 @@ func _input(event):
 		elif event.keycode == KEY_F3:
 			# F3 para forçar registro de portas
 			force_register_all_doors()
+		elif event.keycode == KEY_F4:
+			# F4 para testar tela de vitória com confete
+			show_victory_screen()
 
 func toggle_fullscreen():
 	if DisplayServer.window_get_mode() == DisplayServer.WINDOW_MODE_FULLSCREEN:
@@ -2906,6 +2910,11 @@ func show_victory_screen():
 	# Mostrar tela de vitória
 	victory_screen.visible = true
 	victory_screen.modulate.a = 0.0
+	
+	# Disparar efeito de confete
+	if confetti_particles:
+		confetti_particles.restart()
+		print("🎉 Efeito de confete disparado!")
 	
 	# Fade in da tela
 	var fade_tween = create_tween()

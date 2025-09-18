@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3 uid="uid://bo8uyc0lpjlpj"]
+[gd_scene load_steps=17 format=3 uid="uid://bo8uyc0lpjlpj"]
 
 [ext_resource type="Script" uid="uid://dty27ima3k8sw" path="res://scripts/Main.gd" id="1_5qnwj"]
 [ext_resource type="PackedScene" uid="uid://cj8w5d1hbp0no" path="res://scenes/Player.tscn" id="2_8vhkm"]
@@ -8,6 +8,7 @@
 [ext_resource type="FontFile" uid="uid://cptljk3p3f3a2" path="res://fonts/Barlow-SemiBold.ttf" id="6_barlow_semibold"]
 [ext_resource type="Texture2D" uid="uid://cyh5t3mxf887f" path="res://ui/icons/send.svg" id="7_nxtc6"]
 [ext_resource type="Texture2D" uid="uid://cqjl2cgrwjs38" path="res://assets/expo-ciencias_title.png" id="8_jlsqs"]
+[ext_resource type="Texture2D" uid="uid://cl4e3xrerlhe0" path="res://assets/confetti.png" id="9_confetti"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nxtc6"]
 size = Vector3(89.4974, 1, 74.6561)
@@ -89,6 +90,19 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
+
+[sub_resource type="ParticleProcessMaterial" id="ConfettiMaterial"]
+direction = Vector3(0, 1, 0)
+spread = 180.0
+initial_velocity_min = 200.0
+initial_velocity_max = 350.0
+angular_velocity_min = -8.0
+angular_velocity_max = 14.0
+gravity = Vector3(0, 980, 0)
+damping_min = 5.0
+damping_max = 20.0
+scale_min = 0.6
+scale_max = 1.2
 
 [node name="Main" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.451453, 0)
@@ -796,3 +810,13 @@ theme_override_font_sizes/font_size = 32
 theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "Jogar Novamente"
+
+[node name="ConfettiParticles" type="GPUParticles2D" parent="UI/VictoryScreen"]
+position = Vector2(640, 0)
+emitting = false
+amount = 200
+texture = ExtResource("9_confetti")
+lifetime = 2.0
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ConfettiMaterial")
