@@ -155,19 +155,38 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 20.0
-offset_top = 20.0
-offset_right = -20.0
-offset_bottom = -20.0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 20
 
-[node name="NPCName" type="Label" parent="UI/ChatDialog/VBoxContainer"]
+[node name="HeaderContainer" type="HBoxContainer" parent="UI/ChatDialog/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="NPCName" type="Label" parent="UI/ChatDialog/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.322, 0.592, 0.875, 1)
 theme_override_fonts/font = ExtResource("5_barlow_bold")
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 36
 text = "Professor Silva"
-horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="UI/ChatDialog/VBoxContainer/HeaderContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="CloseButton" type="Button" parent="UI/ChatDialog/VBoxContainer/HeaderContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+theme_override_colors/font_color = Color(0.95, 0.98, 1, 1)
+theme_override_fonts/font = ExtResource("5_barlow_bold")
+theme_override_font_sizes/font_size = 36
+theme_override_styles/normal = SubResource("CloseButtonStyle")
+text = "×"
 
 [node name="ChatHistory" type="RichTextLabel" parent="UI/ChatDialog/VBoxContainer"]
 layout_mode = 2
@@ -198,11 +217,6 @@ text = "Enviar"
 icon = ExtResource("7_nxtc6")
 icon_alignment = 2
 
-[node name="CloseButton" type="Button" parent="UI/ChatDialog/VBoxContainer"]
-layout_mode = 2
-theme_override_fonts/font = ExtResource("6_barlow_semibold")
-theme_override_font_sizes/font_size = 48
-text = "Fechar"
 
 [node name="QuizDialog" type="Panel" parent="UI"]
 visible = false

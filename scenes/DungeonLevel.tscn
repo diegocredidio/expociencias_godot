@@ -54,7 +54,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, -5, 0)
 shape = SubResource("BoxShape3D_backup_floor")
 
 [node name="StartingRoom" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.951677, 0, 0)
+transform = Transform3D(1, 0, -0.000191986, 0, 1, 0, 0.000191986, 0, 1, -0.951677, 0, 0)
 
 [node name="RoomModel" parent="StartingRoom" instance=ExtResource("3_room_small")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.6345, 0, 0)
@@ -353,7 +353,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.960415, 0)
 shape = SubResource("BoxShape3D_wall")
 
 [node name="NPCDiretor" parent="Room8" instance=ExtResource("2_diretor")]
-transform = Transform3D(0.999917, 0, 0.0129151, 0, 1, 0, -0.0129151, 0, 0.999917, 5.27485, 0, -4.47697)
+transform = Transform3D(0.999917, 0, 0.0129151, 0, 1, 0, -0.0129151, 0, 0.999917, -66.2051, 0, 52.6325)
 npc_name = "Dir. Oliveira"
 subject = "Revisão Geral"
 greeting_message = "Parabéns por chegar até aqui! Sou o Diretor Oliveira e farei uma revisão geral dos conhecimentos!"

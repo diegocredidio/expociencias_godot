@@ -7,8 +7,8 @@ extends Node3D
 @onready var chat_history = $UI/ChatDialog/VBoxContainer/ChatHistory
 @onready var chat_input = $UI/ChatDialog/VBoxContainer/InputContainer/ChatInput
 @onready var send_button = $UI/ChatDialog/VBoxContainer/InputContainer/SendButton
-@onready var close_button = $UI/ChatDialog/VBoxContainer/CloseButton
-@onready var npc_name_label = $UI/ChatDialog/VBoxContainer/NPCName
+@onready var close_button = $UI/ChatDialog/VBoxContainer/HeaderContainer/CloseButton
+@onready var npc_name_label = $UI/ChatDialog/VBoxContainer/HeaderContainer/NPCName
 @onready var dungeon_level = $DungeonLevel
 @onready var quiz_dialog = $UI/QuizDialog
 @onready var quiz_question = $UI/QuizDialog/VBoxContainer/QuizQuestion
