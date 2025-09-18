@@ -381,12 +381,17 @@ func open_chat(npc = null):
 	var quiz_mode = npc_data.get("quiz_mode", "pergunta_aberta")
 	
 	print("💬 Quiz mode detectado: ", quiz_mode)
+	print("💬 NPC name: ", chat_npc.npc_name)
 	
-	if quiz_mode == "pergunta_multipla_escolha":
-		# Open quiz interface
+	# Dir. Oliveira SEMPRE usa ChatDialog (traditional chat)
+	if chat_npc.npc_name == "Dir. Oliveira":
+		print("💬 FORÇANDO Dir. Oliveira para ChatDialog")
+		open_traditional_chat(chat_npc)
+	elif quiz_mode == "pergunta_multipla_escolha":
+		# Open quiz interface for other NPCs
 		open_quiz_interface(chat_npc)
 	else:
-		# Open traditional chat interface
+		# Open traditional chat interface for other NPCs with open questions
 		open_traditional_chat(chat_npc)
 	
 	await get_tree().process_frame
@@ -668,11 +673,19 @@ func display_director_result(validation_result: Dictionary):
 	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
 	
 	if is_correct or score >= 60:
-		# Success - show correct feedback
-		print("✅ MOSTRANDO FEEDBACK DE SUCESSO")
+		# Success - show correct feedback for Dir. Oliveira means VICTORY!
+		print("✅ DIRETOR RESPONDEU CORRETAMENTE - VITÓRIA!")
+		print("🏆 Redirecionando para VictoryScreen após feedback...")
+		
+		# Show success feedback first
 		correct_feedback_content.text = feedback
 		correct_feedback_dialog.visible = true
 		chat_dialog.visible = false
+		
+		# Wait for user to read the feedback, then show victory screen
+		await get_tree().create_timer(4.0).timeout
+		correct_feedback_dialog.visible = false
+		show_victory_screen()
 	else:
 		# Failure - show incorrect feedback with try again option
 		print("❌ MOSTRANDO FEEDBACK DE ERRO")
