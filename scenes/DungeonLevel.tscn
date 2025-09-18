@@ -354,9 +354,9 @@ shape = SubResource("BoxShape3D_wall")
 
 [node name="NPCDiretor" parent="Room8" instance=ExtResource("2_diretor")]
 transform = Transform3D(0.999917, 0, 0.0129151, 0, 1, 0, -0.0129151, 0, 0.999917, -66.2051, 0, 52.6325)
-npc_name = "Dir. Oliveira"
+npc_name = "Grande Sábio"
 subject = "Revisão Geral"
-greeting_message = "Parabéns por chegar até aqui! Sou o Diretor Oliveira e farei uma revisão geral dos conhecimentos!"
+greeting_message = "Parabéns por chegar até aqui! Sou o Grande Sábio e farei uma revisão geral dos conhecimentos!"
 
 [node name="character-female-a2" parent="." instance=ExtResource("12_i35j1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.2974, 9.53674e-07, -10.3938)

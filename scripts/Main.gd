@@ -91,7 +91,7 @@ var pulse_tween: Tween
 
 # Responsive scaling
 var base_scale = Vector2(0.351266, 0.351266)
-var base_window_size = Vector2(1152, 648)  # Tamanho de referência
+var base_window_size = Vector2(1152, 648) # Tamanho de referência
 
 # Nova função para fazer requisições via proxy Supabase
 func call_supabase_proxy(prompt: String, subject: String = "Educação", quiz_mode: String = "pergunta_aberta") -> String:
@@ -383,9 +383,9 @@ func open_chat(npc = null):
 	print("💬 Quiz mode detectado: ", quiz_mode)
 	print("💬 NPC name: ", chat_npc.npc_name)
 	
-	# Dir. Oliveira SEMPRE usa ChatDialog (traditional chat)
-	if chat_npc.npc_name == "Dir. Oliveira":
-		print("💬 FORÇANDO Dir. Oliveira para ChatDialog")
+	# Grande Sábio SEMPRE usa ChatDialog (traditional chat)
+	if chat_npc.npc_name == "Grande Sábio":
+		print("💬 FORÇANDO Grande Sábio para ChatDialog")
 		open_traditional_chat(chat_npc)
 	elif quiz_mode == "pergunta_multipla_escolha":
 		# Open quiz interface for other NPCs
@@ -462,14 +462,14 @@ func update_chat_attempt_counter(npc_name: String):
 	var attempt_number = current_attempts + 1
 	chat_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
 
-# Process Dir. Oliveira answer with validation system similar to QuizDialog
+# Process Grande Sábio answer with validation system similar to QuizDialog
 func process_director_answer(message: String):
 	print("🔥 PROCESS_DIRECTOR_ANSWER CHAMADO")
 	print("📝 Resposta do diretor: ", message)
 	
-	# Ensure current_npc_name is set for Dir. Oliveira
+	# Ensure current_npc_name is set for Grande Sábio
 	if current_npc_name == "":
-		current_npc_name = "Dir. Oliveira"
+		current_npc_name = "Grande Sábio"
 		print("🔧 current_npc_name definido como: ", current_npc_name)
 	
 	# Disable input during processing
@@ -480,12 +480,12 @@ func process_director_answer(message: String):
 	last_user_message = message
 	
 	# Create a mock NPC for evaluation
-	var mock_npc = { "npc_name": "Dir. Oliveira", "subject": "Revisão Geral" }
+	var mock_npc = {"npc_name": "Grande Sábio", "subject": "Revisão Geral"}
 	
 	# Use the existing AI evaluation system (directly, without showing status)
 	evaluate_student_answer_for_director(message, mock_npc)
 
-# Special evaluation function for Dir. Oliveira that shows feedback in dialog
+# Special evaluation function for Grande Sábio that shows feedback in dialog
 func evaluate_student_answer_for_director(user_answer: String, npc):
 	print("🤖 EVALUATE_STUDENT_ANSWER_FOR_DIRECTOR CHAMADO")
 	
@@ -577,12 +577,12 @@ func _on_director_answer_evaluated(_result: int, response_code: int, _headers: P
 				
 				# Add 10 points bonus (except for very vague answers that got 0)
 				if score > 0:
-					score = min(100, score + 10)  # Cap at 100
+					score = min(100, score + 10) # Cap at 100
 					print("🎁 Bônus de +10 pontos aplicado! Score final: ", score)
 				else:
 					print("📝 Score 0 mantido (resposta muito vaga)")
 				
-				is_correct = score >= 60  # Lowered threshold for 6th grade
+				is_correct = score >= 60 # Lowered threshold for 6th grade
 				print("🤖 Score final: ", score, ", Correto: ", is_correct)
 			
 			# Clean up feedback to remove the "NOTA: X%" part and keep only explanation
@@ -666,14 +666,14 @@ func display_director_result(validation_result: Dictionary):
 	print("🎯 current_npc_name: ", current_npc_name)
 	
 	# Increment attempt count
-	var npc_name = current_npc_name if current_npc_name != "" else "Dir. Oliveira"
+	var npc_name = current_npc_name if current_npc_name != "" else "Grande Sábio"
 	npc_attempt_counts[npc_name] = npc_attempt_counts.get(npc_name, 0) + 1
 	var current_attempts = npc_attempt_counts[npc_name]
 	
 	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
 	
 	if is_correct or score >= 60:
-		# Success - show correct feedback for Dir. Oliveira means VICTORY!
+		# Success - show correct feedback for Grande Sábio means VICTORY!
 		print("✅ DIRETOR RESPONDEU CORRETAMENTE - VITÓRIA!")
 		print("🏆 Redirecionando para VictoryScreen após feedback...")
 		
@@ -779,7 +779,7 @@ func open_quiz_interface(chat_npc):
 	update_professor_info(chat_npc.npc_name, chat_npc.subject)
 	
 	# Verificar se é o diretor (pergunta aberta)
-	var is_director = chat_npc.npc_name == "Dir. Oliveira"
+	var is_director = chat_npc.npc_name == "Grande Sábio"
 	
 	if is_director:
 		open_open_question_mode(chat_npc)
@@ -905,10 +905,10 @@ func _on_open_question_submit_pressed():
 	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
 	
 	# Para o diretor, verificar se precisa de novas tentativas
-	if npc_name == "Dir. Oliveira":
+	if npc_name == "Grande Sábio":
 		# Se não conseguiu 70% e ainda tem tentativas
 		var score_real = validation_result.score
-		if score_real < 60 and current_attempts < 3:  # Menos de 60% real = fracasso
+		if score_real < 60 and current_attempts < 3: # Menos de 60% real = fracasso
 			print("⚠️ Diretor não alcançou pontuação mínima. Tentando novamente...")
 			# Aguardar feedback, então mostrar nova pergunta
 			await get_tree().create_timer(5.0).timeout
@@ -933,7 +933,7 @@ func display_open_question_result(validation_result: Dictionary):
 	
 	# Lógica especial para o diretor: boost de pontuação para motivar
 	var displayed_score = validation_result.score
-	if current_npc_name == "Dir. Oliveira":
+	if current_npc_name == "Grande Sábio":
 		# Se conseguiu 60% ou mais, mostrar 70% (boost motivacional)
 		if validation_result.score >= 60:
 			displayed_score = max(70, validation_result.score)
@@ -962,12 +962,12 @@ func display_open_question_result(validation_result: Dictionary):
 	feedback_text.visible = true
 	
 	# Verificar se é o diretor e se alcançou 70% (vitória!)
-	if current_npc_name == "Dir. Oliveira" and displayed_score >= 70:
+	if current_npc_name == "Grande Sábio" and displayed_score >= 70:
 		print("🏆 VITÓRIA! Diretor alcançou ", displayed_score, "% - conquistou a vitória!")
 		# Aguardar 3 segundos para o jogador ler o feedback, então mostrar tela de vitória
 		await get_tree().create_timer(3.0).timeout
 		show_victory_screen()
-	elif current_npc_name == "Dir. Oliveira" and displayed_score < 70:
+	elif current_npc_name == "Grande Sábio" and displayed_score < 70:
 		print("⚠️ Diretor ainda não alcançou 70%. Score atual: ", displayed_score, "%")
 	
 	print("✅ Resultado da pergunta aberta exibido!")
@@ -1113,10 +1113,10 @@ func send_message():
 	print("🎯 current_npc_name: ", current_npc_name)
 	print("🎯 message: ", message)
 	
-	# Check if we're in traditional chat mode (Dir. Oliveira)
-	if (current_npc and current_npc.npc_name == "Dir. Oliveira") or current_npc_name == "Dir. Oliveira":
-		print("🎯 DETECTADO DIR. OLIVEIRA - USANDO NOVO SISTEMA")
-		# Process Dir. Oliveira answer with validation system
+	# Check if we're in traditional chat mode (Grande Sábio)
+	if (current_npc and current_npc.npc_name == "Grande Sábio") or current_npc_name == "Grande Sábio":
+		print("🎯 DETECTADO Grande Sábio - USANDO NOVO SISTEMA")
+		# Process Grande Sábio answer with validation system
 		process_director_answer(message)
 		return
 	
@@ -1168,7 +1168,7 @@ func send_message():
 		test_http_connection()
 		return
 	
-	print("🎯 CHEGOU NO SISTEMA ANTIGO - ISSO NÃO DEVERIA ACONTECER PARA DIR. OLIVEIRA")
+	print("🎯 CHEGOU NO SISTEMA ANTIGO - ISSO NÃO DEVERIA ACONTECER PARA Grande Sábio")
 	
 	# Debug message
 	chat_history.text += "\n[color=yellow][b]⏳ STATUS:[/b] Enviando para OpenAI...[/color]"
@@ -1257,8 +1257,8 @@ func generate_question_for_npc(npc):
 	# Create focused single question prompt
 	var simplified_prompt = ""
 	
-	# For Dir. Oliveira (Revisão Geral), randomly select a subject
-	if current_npc_name.contains("Oliveira") or current_npc_subject == "Revisão Geral":
+	# For Grande Sábio (Revisão Geral), randomly select a subject
+	if current_npc_name.contains("Sábio") or current_npc_subject == "Revisão Geral":
 		var subjects = ["Português", "Matemática", "Ciências", "Geografia", "História"]
 		var random_subject = subjects[randi() % subjects.size()]
 		simplified_prompt = "Faça UMA pergunta específica sobre " + random_subject + " (BNCC 6º ano)."
@@ -2636,15 +2636,15 @@ func _on_try_again_button_pressed():
 	# Esconder feedback dialog
 	incorrect_feedback_dialog.visible = false
 	
-	# Check if we're in ChatDialog mode (Dir. Oliveira)
-	if (current_npc and current_npc.npc_name == "Dir. Oliveira") or current_npc_name == "Dir. Oliveira":
-		print("🔄 TENTATIVA NOVAMENTE - DETECTADO DIR. OLIVEIRA")
+	# Check if we're in ChatDialog mode (Grande Sábio)
+	if (current_npc and current_npc.npc_name == "Grande Sábio") or current_npc_name == "Grande Sábio":
+		print("🔄 TENTATIVA NOVAMENTE - DETECTADO Grande Sábio")
 		# Show ChatDialog and generate new question
 		chat_dialog.visible = true
 		quiz_dialog.visible = false
 		
 		# Update attempt counter in chat dialog
-		var npc_name = current_npc_name if current_npc_name != "" else "Dir. Oliveira"
+		var npc_name = current_npc_name if current_npc_name != "" else "Grande Sábio"
 		update_chat_attempt_counter(npc_name)
 		
 		# Clear and prepare for new question
@@ -2653,13 +2653,13 @@ func _on_try_again_button_pressed():
 		chat_input.editable = false
 		send_button.disabled = true
 		
-		# Generate new question for Dir. Oliveira
+		# Generate new question for Grande Sábio
 		await get_tree().create_timer(0.5).timeout
 		# Use a mock NPC object or call the generation directly
-		var mock_npc = { "npc_name": "Dir. Oliveira", "subject": "Revisão Geral" }
+		var mock_npc = {"npc_name": "Grande Sábio", "subject": "Revisão Geral"}
 		generate_question_for_npc(mock_npc)
 	else:
-		print("🔄 TENTATIVA NOVAMENTE - USANDO QUIZ DIALOG (NÃO DEVERIA SER DIR. OLIVEIRA)")
+		print("🔄 TENTATIVA NOVAMENTE - USANDO QUIZ DIALOG (NÃO DEVERIA SER Grande Sábio)")
 		print("🔄 current_npc: ", current_npc.npc_name if current_npc else "null")
 		print("🔄 current_npc_name: ", current_npc_name)
 		# Original QuizDialog logic
@@ -2730,7 +2730,7 @@ func initialize_start_screen():
 	
 	# Mostrar tela de abertura
 	start_screen.visible = true
-	title_sprite.visible = true   # Mostrar Sprite2D com a imagem real
+	title_sprite.visible = true # Mostrar Sprite2D com a imagem real
 	start_button.visible = false
 	
 	# Iniciar animação de bounce na imagem
@@ -2840,7 +2840,7 @@ func create_title_placeholder():
 	# Criar um gradiente simples
 	for y in range(200):
 		for x in range(800):
-			var color = Color(0.8, 0.8, 0.8)  # Branco acinzentado
+			var color = Color(0.8, 0.8, 0.8) # Branco acinzentado
 			# Adicionar um pouco de gradiente
 			if x > 100 and x < 700 and y > 50 and y < 150:
 				color = Color(0.9, 0.9, 0.9)

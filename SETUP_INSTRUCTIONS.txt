@@ -17,7 +17,7 @@ ESTRUTURA DO JOGO:
 - Sala Inicial: Professor Silva (Geografia) - "Qual é a maior região do Brasil?"
 - Sala de Biologia: Professora Santos - "Quais são os cinco reinos dos seres vivos?"  
 - Sala de Ciências: Professor Costa - "Quantos planetas existem no sistema solar?"
-- Sala Final: Diretor Oliveira - Revisão geral
+- Sala Final: Grande Sábio - Revisão geral
 
 TEMAS EDUCATIVOS COBERTOS:
 - Geografia do Brasil (regiões, fronteiras)

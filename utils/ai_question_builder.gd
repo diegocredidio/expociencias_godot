@@ -190,7 +190,7 @@ REGRAS DE QUALIDADE:
 - Adequação: linguagem e conteúdo apropriados para 11-12 anos"""
 
 # User prompt template para perguntas abertas do diretor
-const OPEN_QUESTION_USER_TEMPLATE = """Crie uma questão aberta (dissertativa) para o DIRETOR OLIVEIRA:
+const OPEN_QUESTION_USER_TEMPLATE = """Crie uma questão aberta (dissertativa) para o Grande Sábio:
 
 CONTEXTO:
 - Professor(a): {npc_name}
