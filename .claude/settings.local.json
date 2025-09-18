@@ -12,7 +12,9 @@
       "Bash(godot:*)",
       "Bash(/Applications/Godot.app/Contents/MacOS/Godot:*)",
       "Bash(chmod:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(grep:*)",
+      "Bash(sed:*)"
     ],
     "deny": []
   }

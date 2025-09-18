@@ -9,6 +9,7 @@ extends Node3D
 @onready var send_button = $UI/ChatDialog/VBoxContainer/InputContainer/SendButton
 @onready var close_button = $UI/ChatDialog/VBoxContainer/HeaderContainer/CloseButton
 @onready var npc_name_label = $UI/ChatDialog/VBoxContainer/HeaderContainer/NPCName
+@onready var chat_attempt_count = $UI/ChatDialog/VBoxContainer/HeaderContainer/AttemptCount
 @onready var dungeon_level = $DungeonLevel
 @onready var quiz_dialog = $UI/QuizDialog
 @onready var quiz_question = $UI/QuizDialog/VBoxContainer/QuizQuestion
@@ -396,13 +397,18 @@ func open_traditional_chat(chat_npc):
 	quiz_dialog.visible = false
 	npc_name_label.text = chat_npc.npc_name
 	
-	# Always start fresh - generate a new question each time
-	chat_history.text = "[b]" + chat_npc.npc_name + ":[/b] " + chat_npc.greeting_message
-	chat_history.text += "\n[color=yellow][b]Preparando uma pergunta para você...[/b][/color]"
-	
 	# Initialize attempt count if first time
 	if not npc_attempt_counts.has(chat_npc.npc_name):
 		npc_attempt_counts[chat_npc.npc_name] = 0
+	
+	# Update attempt counter display
+	update_chat_attempt_counter(chat_npc.npc_name)
+	
+	# Show loading message and clear previous content
+	chat_history.text = "[color=yellow][b]Preparando pergunta aberta do diretor...[/b][/color]"
+	chat_input.text = ""
+	chat_input.editable = false
+	send_button.disabled = true
 	
 	# Generate a new question for this NPC
 	generate_question_for_npc(chat_npc)
@@ -445,6 +451,112 @@ func update_attempt_counter(npc_name: String):
 	var current_attempts = npc_attempt_counts.get(npc_name, 0)
 	var attempt_number = current_attempts + 1
 	quiz_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
+
+func update_chat_attempt_counter(npc_name: String):
+	var current_attempts = npc_attempt_counts.get(npc_name, 0)
+	var attempt_number = current_attempts + 1
+	chat_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
+
+# Process Dir. Oliveira answer with validation system similar to QuizDialog
+func process_director_answer(message: String):
+	print("📝 Resposta do diretor: ", message)
+	
+	# Disable input during processing
+	chat_input.editable = false
+	send_button.disabled = true
+	
+	# Store the answer for potential validation
+	last_user_message = message
+	
+	# Simulate answer validation (you can integrate with AI later)
+	# For now, let's create a simple validation system
+	var validation_result = validate_director_answer(message)
+	
+	# Display result based on validation
+	display_director_result(validation_result)
+
+func validate_director_answer(answer: String) -> Dictionary:
+	# Simple validation for testing - you can replace with AI validation later
+	var answer_lower = answer.to_lower().strip_edges()
+	
+	# For testing: answers containing "certo" or "correto" are considered correct
+	# All other answers are considered incorrect to test the feedback system
+	var score = 0
+	var is_correct = false
+	var feedback = ""
+	
+	if "certo" in answer_lower or "correto" in answer_lower:
+		score = 80
+		is_correct = true
+		feedback = "Excelente resposta! Demonstrou bom conhecimento."
+	else:
+		# Most answers will be incorrect to test the feedback system
+		if answer_lower.length() < 5:
+			score = 20
+			feedback = "Resposta muito curta. Tente elaborar mais sua resposta com mais detalhes."
+		else:
+			score = 40
+			feedback = "Resposta não está completa. Revise o conteúdo e tente explicar melhor o conceito."
+	
+	print("🔍 Validação: '", answer, "' -> Score: ", score, ", Correto: ", is_correct)
+	
+	return {
+		"score": score,
+		"is_correct": is_correct,
+		"feedback": feedback
+	}
+
+func display_director_result(validation_result: Dictionary):
+	var score = validation_result.score
+	var is_correct = validation_result.is_correct
+	var feedback = validation_result.feedback
+	
+	print("🎯 DISPLAY_DIRECTOR_RESULT CHAMADA")
+	print("🎯 Score: ", score, ", Correto: ", is_correct)
+	print("🎯 Feedback: ", feedback)
+	
+	# Increment attempt count
+	var npc_name = current_npc.npc_name
+	npc_attempt_counts[npc_name] = npc_attempt_counts.get(npc_name, 0) + 1
+	var current_attempts = npc_attempt_counts[npc_name]
+	
+	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
+	
+	if is_correct or score >= 70:
+		# Success - show correct feedback
+		print("✅ MOSTRANDO FEEDBACK DE SUCESSO")
+		correct_feedback_content.text = feedback
+		correct_feedback_dialog.visible = true
+		chat_dialog.visible = false
+	else:
+		# Failure - show incorrect feedback with try again option
+		print("❌ MOSTRANDO FEEDBACK DE ERRO")
+		print("❌ Tentativas: ", current_attempts, "/3")
+		
+		incorrect_feedback_content.text = feedback
+		incorrect_attempt_info.text = "Tentativa " + str(current_attempts) + " de 3"
+		
+		if current_attempts >= 3:
+			print("💀 SEM MAIS TENTATIVAS - GAME OVER")
+			# No more attempts - disable try again button
+			try_again_button.text = "Sem mais tentativas"
+			try_again_button.disabled = true
+			
+			# Show dialog first, then game over after delay
+			incorrect_feedback_dialog.visible = true
+			print("🔴 incorrect_feedback_dialog.visible = true (GAME OVER)")
+			await get_tree().create_timer(3.0).timeout
+			show_game_over_screen()
+		else:
+			print("🔄 PERMITINDO NOVA TENTATIVA")
+			# Allow try again
+			try_again_button.text = "Tentar Novamente"
+			try_again_button.disabled = false
+			incorrect_feedback_dialog.visible = true
+			print("🔴 incorrect_feedback_dialog.visible = true (TRY AGAIN)")
+		
+		chat_dialog.visible = false
+		print("🔴 chat_dialog.visible = false")
 
 func update_professor_info(npc_name: String, npc_subject: String):
 	# Atualizar nome do professor com disciplina
@@ -835,6 +947,12 @@ var last_user_message = ""
 func send_message():
 	var message = chat_input.text.strip_edges()
 	if message == "":
+		return
+	
+	# Check if we're in traditional chat mode (Dir. Oliveira)
+	if current_npc and current_npc.npc_name == "Dir. Oliveira":
+		# Process Dir. Oliveira answer with validation system
+		process_director_answer(message)
 		return
 	
 	last_user_message = message # Store user's answer for validation
@@ -1701,11 +1819,15 @@ func _on_question_generated(_result: int, response_code: int, _headers: PackedSt
 				chat_history.text += "\n[b]" + current_npc_name + ":[/b] " + generated_question
 				chat_history.text += "\n[color=gray][i](Você tem 3 tentativas para esta pergunta)[/i][/color]"
 			else:
-				# Subsequent questions - just add the new question
+				# Subsequent questions - clear previous content and show new question
+				chat_history.text = "[b]" + current_npc_name + ":[/b] " + generated_question
 				var remaining_attempts = 3 - attempt_count
-				chat_history.text += "\n[b]" + current_npc_name + ":[/b] Vamos tentar com esta pergunta:"
-				chat_history.text += "\n[b]" + current_npc_name + ":[/b] " + generated_question
 				chat_history.text += "\n[color=gray][i](Tentativas restantes: " + str(remaining_attempts) + ")[/i][/color]"
+			
+			# Enable input after displaying question
+			chat_input.editable = true
+			send_button.disabled = false
+			chat_input.grab_focus()
 		else:
 			chat_history.text += "\n[color=red][b]❌ Erro:[/b] Falha ao gerar pergunta[/color]"
 	else:
@@ -2347,23 +2469,42 @@ func _on_try_again_button_pressed():
 	# Esconder feedback dialog
 	incorrect_feedback_dialog.visible = false
 	
-	# Mostrar quiz dialog novamente, mas ainda com botões desabilitados
-	quiz_dialog.visible = true
-	
-	# Update attempt counter in quiz dialog
-	update_attempt_counter(current_npc_name)
-	
-	# Mostrar mensagem de carregamento
-	quiz_question.text = "[color=cyan][b]🔄 Gerando nova pergunta...[/b][/color]"
-	
-	# Reset quiz buttons (ainda desabilitados)
-	reset_quiz_buttons()
-	# NÃO habilitar botões ainda - só quando a nova pergunta carregar
-	
-	# Aguardar um momento e gerar nova pergunta
-	await get_tree().create_timer(0.5).timeout
-	if current_npc_name != "":
-		generate_quiz_question_for_npc(null)
+	# Check if we're in ChatDialog mode (Dir. Oliveira)
+	if current_npc and current_npc.npc_name == "Dir. Oliveira":
+		# Show ChatDialog and generate new question
+		chat_dialog.visible = true
+		quiz_dialog.visible = false
+		
+		# Update attempt counter in chat dialog
+		update_chat_attempt_counter(current_npc.npc_name)
+		
+		# Clear and prepare for new question
+		chat_history.text = "[color=cyan][b]🔄 Preparando nova pergunta...[/b][/color]"
+		chat_input.text = ""
+		chat_input.editable = false
+		send_button.disabled = true
+		
+		# Generate new question for Dir. Oliveira
+		await get_tree().create_timer(0.5).timeout
+		generate_question_for_npc(current_npc)
+	else:
+		# Original QuizDialog logic
+		quiz_dialog.visible = true
+		
+		# Update attempt counter in quiz dialog
+		update_attempt_counter(current_npc_name)
+		
+		# Mostrar mensagem de carregamento
+		quiz_question.text = "[color=cyan][b]🔄 Gerando nova pergunta...[/b][/color]"
+		
+		# Reset quiz buttons (ainda desabilitados)
+		reset_quiz_buttons()
+		# NÃO habilitar botões ainda - só quando a nova pergunta carregar
+		
+		# Aguardar um momento e gerar nova pergunta
+		await get_tree().create_timer(0.5).timeout
+		if current_npc_name != "":
+			generate_quiz_question_for_npc(null)
 
 func _on_close_feedback_button_pressed():
 	print("🎉 Fechando feedback de sucesso e desbloqueando porta...")
