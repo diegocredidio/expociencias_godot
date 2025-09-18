@@ -524,7 +524,7 @@ func evaluate_student_answer_for_director(user_answer: String, npc):
 	simplified_prompt += " - Respostas parcialmente corretas: 50-70%"
 	simplified_prompt += " - Respostas corretas: 80-100%"
 	simplified_prompt += " SEMPRE seja encorajador no feedback, mesmo dando 0%. Motive a criança a estudar."
-	simplified_prompt += " Mínimo 60% para aprovação."
+	simplified_prompt += " Mínimo 60% para aprovação (mas será dado +10 bônus para respostas não-vagas)."
 	simplified_prompt += " FORMATO OBRIGATÓRIO: 'NOTA: X% - [feedback motivador e educativo]'"
 	
 	var body = JSON.stringify({
@@ -569,8 +569,16 @@ func _on_director_answer_evaluated(_result: int, response_code: int, _headers: P
 			var score_match = score_regex.search(ai_feedback)
 			if score_match:
 				score = int(score_match.get_string(1))
+				
+				# Add 10 points bonus (except for very vague answers that got 0)
+				if score > 0:
+					score = min(100, score + 10)  # Cap at 100
+					print("🎁 Bônus de +10 pontos aplicado! Score final: ", score)
+				else:
+					print("📝 Score 0 mantido (resposta muito vaga)")
+				
 				is_correct = score >= 60  # Lowered threshold for 6th grade
-				print("🤖 Score extraído: ", score, "%, Correto: ", is_correct)
+				print("🤖 Score final: ", score, ", Correto: ", is_correct)
 			
 			# Clean up feedback to remove the "NOTA: X%" part and keep only explanation
 			var feedback_regex = RegEx.new()
@@ -579,9 +587,9 @@ func _on_director_answer_evaluated(_result: int, response_code: int, _headers: P
 			if feedback_match:
 				feedback = feedback_match.get_string(1).strip_edges()
 			
-			# Add score to feedback display
+			# Add score to feedback display (without % symbol)
 			if score > 0:
-				feedback = "Pontuação: " + str(score) + "%\n\n" + feedback
+				feedback = "Pontuação: " + str(score) + "\n\n" + feedback
 			
 			# Display result using the dialog system
 			display_director_result({
@@ -679,10 +687,11 @@ func display_director_result(validation_result: Dictionary):
 			try_again_button.text = "Sem mais tentativas"
 			try_again_button.disabled = true
 			
-			# Show dialog first, then game over after delay
+			# Show dialog first, then game over after longer delay to read feedback
 			incorrect_feedback_dialog.visible = true
 			print("🔴 incorrect_feedback_dialog.visible = true (GAME OVER)")
-			await get_tree().create_timer(3.0).timeout
+			print("⏰ Aguardando 6 segundos para leitura do feedback...")
+			await get_tree().create_timer(6.0).timeout
 			show_game_over_screen()
 		else:
 			print("🔄 PERMITINDO NOVA TENTATIVA")
