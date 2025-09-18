@@ -1971,6 +1971,16 @@ func _on_question_generated(_result: int, response_code: int, _headers: PackedSt
 		# Handle Supabase proxy response format
 		if response != null and response.has("success") and response.success and response.has("response"):
 			var generated_question = response["response"]
+			
+			# Clean up escape characters for better display
+			generated_question = generated_question.replace("\\(", "(")
+			generated_question = generated_question.replace("\\)", ")")
+			generated_question = generated_question.replace("\\[", "[")
+			generated_question = generated_question.replace("\\]", "]")
+			generated_question = generated_question.replace("\\{", "{")
+			generated_question = generated_question.replace("\\}", "}")
+			generated_question = generated_question.replace("\\\\", "\\")
+			
 			npc_questions[current_npc_name] = generated_question
 			
 			var attempt_count = npc_attempt_counts.get(current_npc_name, 0)
