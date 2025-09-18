@@ -175,7 +175,7 @@ Seja claro, educativo e motivador. Use linguagem simples e exemplos práticos.`;
           }
         ],
         max_tokens: 800,
-        temperature: 0.9,
+        temperature: 0.6,
       }),
     });
 

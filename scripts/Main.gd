@@ -400,7 +400,10 @@ func open_chat(npc = null):
 func open_traditional_chat(chat_npc):
 	chat_dialog.visible = true
 	quiz_dialog.visible = false
-	npc_name_label.text = chat_npc.npc_name
+	if chat_npc.npc_name == "Grande Sábio":
+		npc_name_label.text = ""
+	else:
+		npc_name_label.text = chat_npc.npc_name
 	
 	# Initialize attempt count if first time
 	if not npc_attempt_counts.has(chat_npc.npc_name):
@@ -1992,12 +1995,19 @@ func _on_question_generated(_result: int, response_code: int, _headers: PackedSt
 			# Update chat with the generated question
 			if attempt_count == 0:
 				# First question - include greeting
-				chat_history.text = "[b]" + current_npc_name + ":[/b] " + greeting
-				chat_history.text += "\n[b]" + current_npc_name + ":[/b] " + generated_question
+				if current_npc_name == "Grande Sábio":
+					chat_history.text = greeting
+					chat_history.text += "\n" + generated_question
+				else:
+					chat_history.text = "[b]" + current_npc_name + ":[/b] " + greeting
+					chat_history.text += "\n[b]" + current_npc_name + ":[/b] " + generated_question
 				chat_history.text += "\n[color=gray][i](Você tem 3 tentativas para esta pergunta)[/i][/color]"
 			else:
 				# Subsequent questions - clear previous content and show new question
-				chat_history.text = "[b]" + current_npc_name + ":[/b] " + generated_question
+				if current_npc_name == "Grande Sábio":
+					chat_history.text = generated_question
+				else:
+					chat_history.text = "[b]" + current_npc_name + ":[/b] " + generated_question
 				var remaining_attempts = 3 - attempt_count
 				chat_history.text += "\n[color=gray][i](Tentativas restantes: " + str(remaining_attempts) + ")[/i][/color]"
 			
@@ -2064,8 +2074,11 @@ func _on_answer_evaluated(_result: int, response_code: int, _headers: PackedStri
 		# Handle Supabase proxy response format
 		if response != null and response.has("success") and response.success and response.has("response"):
 			var evaluation_result = response["response"]
-			chat_history.text += "\n[color=white][b]" + current_npc_name + ":[/b][/color]"
-			chat_history.text += "\n[color=lightgreen]" + evaluation_result + "[/color]"
+			if current_npc_name == "Grande Sábio":
+				chat_history.text += "\n[color=lightgreen]" + evaluation_result + "[/color]"
+			else:
+				chat_history.text += "\n[color=white][b]" + current_npc_name + ":[/b][/color]"
+				chat_history.text += "\n[color=lightgreen]" + evaluation_result + "[/color]"
 			
 			# Extract percentage and validate (70% minimum for approval)
 			var percentage = extract_percentage(evaluation_result)
@@ -2307,8 +2320,11 @@ func _on_ai_response_received(_result: int, response_code: int, _headers: Packed
 		# Handle Supabase proxy response format
 		if response != null and response.has("success") and response.success and response.has("response"):
 			var ai_message = response["response"]
-			chat_history.text += "\n[color=white][b]" + current_npc_name + ":[/b][/color]"
-			chat_history.text += "\n[color=lightgreen]" + ai_message + "[/color]"
+			if current_npc_name == "Grande Sábio":
+				chat_history.text += "\n[color=lightgreen]" + ai_message + "[/color]"
+			else:
+				chat_history.text += "\n[color=white][b]" + current_npc_name + ":[/b][/color]"
+				chat_history.text += "\n[color=lightgreen]" + ai_message + "[/color]"
 			
 			# This function is no longer used - evaluation is now done separately
 		else:
