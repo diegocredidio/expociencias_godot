@@ -474,14 +474,136 @@ func process_director_answer(message: String):
 	# Store the answer for potential validation
 	last_user_message = message
 	
-	# Simulate answer validation (you can integrate with AI later)
-	# For now, let's create a simple validation system
-	var validation_result = validate_director_answer(message)
+	# Use AI validation system like the original system
+	chat_history.text += "\n[color=blue][b]Você:[/b] " + message + "[/color]"
+	chat_history.text += "\n[color=yellow][b]⏳ STATUS:[/b] Avaliando sua resposta...[/color]"
 	
-	print("🔥 VALIDATION_RESULT: ", validation_result)
+	# Create a mock NPC for evaluation
+	var mock_npc = { "npc_name": "Dir. Oliveira", "subject": "Revisão Geral" }
 	
-	# Display result based on validation
-	display_director_result(validation_result)
+	# Use the existing AI evaluation system
+	evaluate_student_answer_for_director(message, mock_npc)
+
+# Special evaluation function for Dir. Oliveira that shows feedback in dialog
+func evaluate_student_answer_for_director(user_answer: String, npc):
+	print("🤖 EVALUATE_STUDENT_ANSWER_FOR_DIRECTOR CHAMADO")
+	
+	if not npc:
+		display_director_result({
+			"score": 0,
+			"is_correct": false,
+			"feedback": "Erro interno: NPC inválido para avaliação."
+		})
+		return
+	
+	# Clean up existing requests
+	var existing_http = get_children().filter(func(node): return node is HTTPRequest)
+	for node in existing_http:
+		node.queue_free()
+	
+	# Create request for answer evaluation
+	var http_request = HTTPRequest.new()
+	http_request.name = "Director_Evaluation_Request"
+	add_child(http_request)
+	http_request.timeout = 15.0
+	
+	# Connect signal to special handler for director
+	http_request.request_completed.connect(_on_director_answer_evaluated)
+	
+	# Use Supabase proxy headers
+	var headers = [
+		"Content-Type: application/json",
+		"Authorization: Bearer " + SupabaseConfig.ANON_KEY,
+		"apikey: " + SupabaseConfig.ANON_KEY
+	]
+	
+	# Create rigorous evaluation prompt
+	var current_question = npc_questions.get(current_npc_name, "")
+	var simplified_prompt = "Avalie esta resposta com rigor acadêmico (BNCC 6º ano):"
+	simplified_prompt += " PERGUNTA: " + current_question
+	simplified_prompt += " RESPOSTA DO ALUNO: " + user_answer
+	simplified_prompt += " INSTRUÇÕES: Dê uma nota de 0-100% baseada na correção factual."
+	simplified_prompt += " Mínimo 70% para aprovação. Seja rigoroso mas justo."
+	simplified_prompt += " FORMATO: 'NOTA: X% - [explicação detalhada do erro ou acerto]'"
+	
+	var body = JSON.stringify({
+		"prompt": simplified_prompt,
+		"subject": current_npc_subject,
+		"quiz_mode": "avaliacao"
+	})
+	
+	print("🌐 Enviando avaliação para IA...")
+	var result = http_request.request(supabase_proxy_url, headers, HTTPClient.METHOD_POST, body)
+	
+	if result != OK:
+		print("❌ Falha ao enviar requisição de avaliação: ", result)
+		display_director_result({
+			"score": 0,
+			"is_correct": false,
+			"feedback": "Erro de conexão. Tente novamente."
+		})
+		http_request.queue_free()
+
+# Callback for Director's AI evaluation
+func _on_director_answer_evaluated(_result: int, response_code: int, _headers: PackedStringArray, body: PackedByteArray):
+	print("🤖 RESPOSTA DA IA RECEBIDA PARA DIRETOR")
+	print("🤖 Response code: ", response_code)
+	
+	if response_code == 200 and body.size() > 0:
+		var body_string = body.get_string_from_utf8()
+		var response = JSON.parse_string(body_string)
+		
+		if response != null and response.has("success") and response.success and response.has("response"):
+			var ai_feedback = response["response"]
+			print("🤖 AI Feedback: ", ai_feedback)
+			
+			# Parse the AI response to extract score and feedback
+			var score = 0
+			var feedback = ai_feedback
+			var is_correct = false
+			
+			# Try to extract score from "NOTA: X%" format
+			var score_regex = RegEx.new()
+			score_regex.compile("NOTA:\\s*(\\d+)%")
+			var score_match = score_regex.search(ai_feedback)
+			if score_match:
+				score = int(score_match.get_string(1))
+				is_correct = score >= 70
+				print("🤖 Score extraído: ", score, "%, Correto: ", is_correct)
+			
+			# Clean up feedback to remove the "NOTA: X%" part and keep only explanation
+			var feedback_regex = RegEx.new()
+			feedback_regex.compile("NOTA:\\s*\\d+%\\s*-\\s*(.*)")
+			var feedback_match = feedback_regex.search(ai_feedback)
+			if feedback_match:
+				feedback = feedback_match.get_string(1).strip_edges()
+			
+			# Display result using the dialog system
+			display_director_result({
+				"score": score,
+				"is_correct": is_correct,
+				"feedback": feedback
+			})
+		else:
+			print("❌ Resposta da IA inválida")
+			display_director_result({
+				"score": 0,
+				"is_correct": false,
+				"feedback": "Erro ao processar resposta da IA. Tente novamente."
+			})
+	else:
+		print("❌ Erro na requisição: ", response_code)
+		display_director_result({
+			"score": 0,
+			"is_correct": false,
+			"feedback": "Erro de comunicação com a IA. Tente novamente."
+		})
+	
+	# Clean up request
+	var director_request = get_node_or_null("Director_Evaluation_Request")
+	if director_request:
+		director_request.queue_free()
+		print("🧹 HTTPRequest do diretor limpo")
 
 func validate_director_answer(answer: String) -> Dictionary:
 	# Simple validation for testing - you can replace with AI validation later
