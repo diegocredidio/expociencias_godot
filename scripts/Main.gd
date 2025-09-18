@@ -459,7 +459,13 @@ func update_chat_attempt_counter(npc_name: String):
 
 # Process Dir. Oliveira answer with validation system similar to QuizDialog
 func process_director_answer(message: String):
+	print("🔥 PROCESS_DIRECTOR_ANSWER CHAMADO")
 	print("📝 Resposta do diretor: ", message)
+	
+	# Ensure current_npc_name is set for Dir. Oliveira
+	if current_npc_name == "":
+		current_npc_name = "Dir. Oliveira"
+		print("🔧 current_npc_name definido como: ", current_npc_name)
 	
 	# Disable input during processing
 	chat_input.editable = false
@@ -471,6 +477,8 @@ func process_director_answer(message: String):
 	# Simulate answer validation (you can integrate with AI later)
 	# For now, let's create a simple validation system
 	var validation_result = validate_director_answer(message)
+	
+	print("🔥 VALIDATION_RESULT: ", validation_result)
 	
 	# Display result based on validation
 	display_director_result(validation_result)
@@ -514,9 +522,11 @@ func display_director_result(validation_result: Dictionary):
 	print("🎯 DISPLAY_DIRECTOR_RESULT CHAMADA")
 	print("🎯 Score: ", score, ", Correto: ", is_correct)
 	print("🎯 Feedback: ", feedback)
+	print("🎯 current_npc: ", current_npc.npc_name if current_npc else "null")
+	print("🎯 current_npc_name: ", current_npc_name)
 	
 	# Increment attempt count
-	var npc_name = current_npc.npc_name
+	var npc_name = current_npc_name if current_npc_name != "" else "Dir. Oliveira"
 	npc_attempt_counts[npc_name] = npc_attempt_counts.get(npc_name, 0) + 1
 	var current_attempts = npc_attempt_counts[npc_name]
 	
@@ -949,8 +959,14 @@ func send_message():
 	if message == "":
 		return
 	
+	print("🎯 SEND_MESSAGE CHAMADO")
+	print("🎯 current_npc: ", current_npc.npc_name if current_npc else "null")
+	print("🎯 current_npc_name: ", current_npc_name)
+	print("🎯 message: ", message)
+	
 	# Check if we're in traditional chat mode (Dir. Oliveira)
-	if current_npc and current_npc.npc_name == "Dir. Oliveira":
+	if (current_npc and current_npc.npc_name == "Dir. Oliveira") or current_npc_name == "Dir. Oliveira":
+		print("🎯 DETECTADO DIR. OLIVEIRA - USANDO NOVO SISTEMA")
 		# Process Dir. Oliveira answer with validation system
 		process_director_answer(message)
 		return
@@ -1002,6 +1018,8 @@ func send_message():
 		chat_history.text += "\n[color=cyan][b]🧪 TESTE HTTP:[/b] Iniciando teste de conexão...[/color]"
 		test_http_connection()
 		return
+	
+	print("🎯 CHEGOU NO SISTEMA ANTIGO - ISSO NÃO DEVERIA ACONTECER PARA DIR. OLIVEIRA")
 	
 	# Debug message
 	chat_history.text += "\n[color=yellow][b]⏳ STATUS:[/b] Enviando para OpenAI...[/color]"
@@ -2470,13 +2488,15 @@ func _on_try_again_button_pressed():
 	incorrect_feedback_dialog.visible = false
 	
 	# Check if we're in ChatDialog mode (Dir. Oliveira)
-	if current_npc and current_npc.npc_name == "Dir. Oliveira":
+	if (current_npc and current_npc.npc_name == "Dir. Oliveira") or current_npc_name == "Dir. Oliveira":
+		print("🔄 TENTATIVA NOVAMENTE - DETECTADO DIR. OLIVEIRA")
 		# Show ChatDialog and generate new question
 		chat_dialog.visible = true
 		quiz_dialog.visible = false
 		
 		# Update attempt counter in chat dialog
-		update_chat_attempt_counter(current_npc.npc_name)
+		var npc_name = current_npc_name if current_npc_name != "" else "Dir. Oliveira"
+		update_chat_attempt_counter(npc_name)
 		
 		# Clear and prepare for new question
 		chat_history.text = "[color=cyan][b]🔄 Preparando nova pergunta...[/b][/color]"
@@ -2486,8 +2506,13 @@ func _on_try_again_button_pressed():
 		
 		# Generate new question for Dir. Oliveira
 		await get_tree().create_timer(0.5).timeout
-		generate_question_for_npc(current_npc)
+		# Use a mock NPC object or call the generation directly
+		var mock_npc = { "npc_name": "Dir. Oliveira", "subject": "Revisão Geral" }
+		generate_question_for_npc(mock_npc)
 	else:
+		print("🔄 TENTATIVA NOVAMENTE - USANDO QUIZ DIALOG (NÃO DEVERIA SER DIR. OLIVEIRA)")
+		print("🔄 current_npc: ", current_npc.npc_name if current_npc else "null")
+		print("🔄 current_npc_name: ", current_npc_name)
 		# Original QuizDialog logic
 		quiz_dialog.visible = true
 		
