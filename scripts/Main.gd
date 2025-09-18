@@ -474,14 +474,10 @@ func process_director_answer(message: String):
 	# Store the answer for potential validation
 	last_user_message = message
 	
-	# Use AI validation system like the original system
-	chat_history.text += "\n[color=blue][b]Você:[/b] " + message + "[/color]"
-	chat_history.text += "\n[color=yellow][b]⏳ STATUS:[/b] Avaliando sua resposta...[/color]"
-	
 	# Create a mock NPC for evaluation
 	var mock_npc = { "npc_name": "Dir. Oliveira", "subject": "Revisão Geral" }
 	
-	# Use the existing AI evaluation system
+	# Use the existing AI evaluation system (directly, without showing status)
 	evaluate_student_answer_for_director(message, mock_npc)
 
 # Special evaluation function for Dir. Oliveira that shows feedback in dialog
@@ -517,14 +513,19 @@ func evaluate_student_answer_for_director(user_answer: String, npc):
 		"apikey: " + SupabaseConfig.ANON_KEY
 	]
 	
-	# Create rigorous evaluation prompt
+	# Create balanced evaluation prompt for 6th grade
 	var current_question = npc_questions.get(current_npc_name, "")
-	var simplified_prompt = "Avalie esta resposta com rigor acadêmico (BNCC 6º ano):"
+	var simplified_prompt = "Avalie esta resposta de um aluno do 6º ano de forma justa mas encorajadora:"
 	simplified_prompt += " PERGUNTA: " + current_question
 	simplified_prompt += " RESPOSTA DO ALUNO: " + user_answer
-	simplified_prompt += " INSTRUÇÕES: Dê uma nota de 0-100% baseada na correção factual."
-	simplified_prompt += " Mínimo 70% para aprovação. Seja rigoroso mas justo."
-	simplified_prompt += " FORMATO: 'NOTA: X% - [explicação detalhada do erro ou acerto]'"
+	simplified_prompt += " CRITÉRIOS RIGOROSOS:"
+	simplified_prompt += " - Respostas como 'não sei', 'não lembro', vagas ou sem conteúdo: 0% SEM PIEDADE"
+	simplified_prompt += " - Respostas com algum conhecimento mas incorretas: 20-40%"
+	simplified_prompt += " - Respostas parcialmente corretas: 50-70%"
+	simplified_prompt += " - Respostas corretas: 80-100%"
+	simplified_prompt += " SEMPRE seja encorajador no feedback, mesmo dando 0%. Motive a criança a estudar."
+	simplified_prompt += " Mínimo 60% para aprovação."
+	simplified_prompt += " FORMATO OBRIGATÓRIO: 'NOTA: X% - [feedback motivador e educativo]'"
 	
 	var body = JSON.stringify({
 		"prompt": simplified_prompt,
@@ -568,7 +569,7 @@ func _on_director_answer_evaluated(_result: int, response_code: int, _headers: P
 			var score_match = score_regex.search(ai_feedback)
 			if score_match:
 				score = int(score_match.get_string(1))
-				is_correct = score >= 70
+				is_correct = score >= 60  # Lowered threshold for 6th grade
 				print("🤖 Score extraído: ", score, "%, Correto: ", is_correct)
 			
 			# Clean up feedback to remove the "NOTA: X%" part and keep only explanation
@@ -577,6 +578,10 @@ func _on_director_answer_evaluated(_result: int, response_code: int, _headers: P
 			var feedback_match = feedback_regex.search(ai_feedback)
 			if feedback_match:
 				feedback = feedback_match.get_string(1).strip_edges()
+			
+			# Add score to feedback display
+			if score > 0:
+				feedback = "Pontuação: " + str(score) + "%\n\n" + feedback
 			
 			# Display result using the dialog system
 			display_director_result({
@@ -654,7 +659,7 @@ func display_director_result(validation_result: Dictionary):
 	
 	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
 	
-	if is_correct or score >= 70:
+	if is_correct or score >= 60:
 		# Success - show correct feedback
 		print("✅ MOSTRANDO FEEDBACK DE SUCESSO")
 		correct_feedback_content.text = feedback
