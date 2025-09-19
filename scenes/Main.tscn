@@ -591,7 +591,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="StartScreen" type="Panel" parent="UI"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -804,7 +803,6 @@ emitting = false
 amount = 200
 texture = ExtResource("9_confetti")
 lifetime = 2.0
-one_shot = true
 explosiveness = 1.0
 randomness = 0.2
 fixed_fps = 30
@@ -824,9 +822,11 @@ scale_amount_max = 1.2
 
 [node name="ConfettiParticles2" type="CPUParticles2D" parent="UI/VictoryScreen"]
 position = Vector2(830, 0)
+emitting = false
 amount = 200
 texture = ExtResource("9_confetti")
 lifetime = 2.0
+one_shot = true
 explosiveness = 1.0
 randomness = 0.27
 fixed_fps = 30
@@ -845,9 +845,11 @@ scale_amount_max = 1.2
 
 [node name="ConfettiParticlesGreen" type="CPUParticles2D" parent="UI/VictoryScreen"]
 position = Vector2(450, 0)
+emitting = false
 amount = 200
 texture = ExtResource("9_confetti")
 lifetime = 2.0
+one_shot = true
 explosiveness = 1.0
 randomness = 0.25
 fixed_fps = 30
