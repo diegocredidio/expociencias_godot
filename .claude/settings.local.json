@@ -14,7 +14,8 @@
       "Bash(chmod:*)",
       "Bash(git checkout:*)",
       "Bash(grep:*)",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "Bash(gdformat:*)"
     ],
     "deny": []
   }

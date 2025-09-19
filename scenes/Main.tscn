@@ -1,4 +1,4 @@
-[gd_scene load_steps=17 format=3 uid="uid://bo8uyc0lpjlpj"]
+[gd_scene load_steps=16 format=3 uid="uid://bo8uyc0lpjlpj"]
 
 [ext_resource type="Script" uid="uid://dty27ima3k8sw" path="res://scripts/Main.gd" id="1_5qnwj"]
 [ext_resource type="PackedScene" uid="uid://cj8w5d1hbp0no" path="res://scenes/Player.tscn" id="2_8vhkm"]
@@ -90,19 +90,6 @@ corner_radius_top_left = 10
 corner_radius_top_right = 10
 corner_radius_bottom_right = 10
 corner_radius_bottom_left = 10
-
-[sub_resource type="ParticleProcessMaterial" id="ConfettiMaterial"]
-direction = Vector3(0, 1, 0)
-spread = 180.0
-initial_velocity_min = 200.0
-initial_velocity_max = 350.0
-angular_velocity_min = -8.0
-angular_velocity_max = 14.0
-gravity = Vector3(0, 980, 0)
-damping_min = 5.0
-damping_max = 20.0
-scale_min = 0.6
-scale_max = 1.2
 
 [node name="Main" type="Node3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.451453, 0)
@@ -604,6 +591,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="StartScreen" type="Panel" parent="UI"]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -744,7 +732,6 @@ theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "Jogar Novamente"
 
 [node name="VictoryScreen" type="Panel" parent="UI"]
-visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -811,7 +798,7 @@ theme_override_styles/hover = SubResource("QuizButtonHoverStyle")
 theme_override_styles/normal = SubResource("QuizButtonStyle")
 text = "Jogar Novamente"
 
-[node name="ConfettiParticles" type="GPUParticles2D" parent="UI/VictoryScreen"]
+[node name="ConfettiParticles" type="CPUParticles2D" parent="UI/VictoryScreen"]
 position = Vector2(640, 0)
 emitting = false
 amount = 200
@@ -819,4 +806,61 @@ texture = ExtResource("9_confetti")
 lifetime = 2.0
 one_shot = true
 explosiveness = 1.0
-process_material = SubResource("ConfettiMaterial")
+randomness = 0.2
+fixed_fps = 30
+fract_delta = false
+draw_order = 1
+direction = Vector2(-1, 1)
+spread = 180.0
+gravity = Vector2(130, 490)
+initial_velocity_min = 200.0
+initial_velocity_max = 350.0
+angular_velocity_min = -8.0
+angular_velocity_max = 14.0
+damping_min = 5.0
+damping_max = 20.0
+scale_amount_min = 0.6
+scale_amount_max = 1.2
+
+[node name="ConfettiParticles2" type="CPUParticles2D" parent="UI/VictoryScreen"]
+position = Vector2(830, 0)
+amount = 200
+texture = ExtResource("9_confetti")
+lifetime = 2.0
+explosiveness = 1.0
+randomness = 0.27
+fixed_fps = 30
+draw_order = 1
+direction = Vector2(-1, 1)
+spread = 180.0
+gravity = Vector2(130, 490)
+initial_velocity_min = 200.0
+initial_velocity_max = 350.0
+angular_velocity_min = -8.0
+angular_velocity_max = 14.0
+damping_min = 5.0
+damping_max = 20.0
+scale_amount_min = 0.6
+scale_amount_max = 1.2
+
+[node name="ConfettiParticlesGreen" type="CPUParticles2D" parent="UI/VictoryScreen"]
+position = Vector2(450, 0)
+amount = 200
+texture = ExtResource("9_confetti")
+lifetime = 2.0
+explosiveness = 1.0
+randomness = 0.25
+fixed_fps = 30
+draw_order = 1
+direction = Vector2(-1, 1)
+spread = 180.0
+gravity = Vector2(130, 490)
+initial_velocity_min = 200.0
+initial_velocity_max = 350.0
+angular_velocity_min = -8.0
+angular_velocity_max = 14.0
+damping_min = 5.0
+damping_max = 20.0
+scale_amount_min = 0.6
+scale_amount_max = 1.2
+color = Color(0.2, 0.8, 0.2, 1)

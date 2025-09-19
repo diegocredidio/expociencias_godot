@@ -52,6 +52,7 @@ extends Node3D
 @onready var victory_screen = $UI/VictoryScreen
 @onready var play_again_button = $UI/VictoryScreen/CenterContainer/VBoxContainer/PlayAgainButton
 @onready var confetti_particles = $UI/VictoryScreen/ConfettiParticles
+@onready var confetti_particles_green = $UI/VictoryScreen/ConfettiParticlesGreen
 
 # AI Question Builder
 var ai_question_builder: AIQuestionBuilder
@@ -2915,6 +2916,10 @@ func show_victory_screen():
 	if confetti_particles:
 		confetti_particles.restart()
 		print("🎉 Efeito de confete disparado!")
+	
+	if confetti_particles_green:
+		confetti_particles_green.restart()
+		print("🎉 Efeito de confete verde disparado!")
 	
 	# Fade in da tela
 	var fade_tween = create_tween()
