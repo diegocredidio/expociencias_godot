@@ -414,6 +414,15 @@ func open_traditional_chat(chat_npc):
 	if not npc_attempt_counts.has(chat_npc.npc_name):
 		npc_attempt_counts[chat_npc.npc_name] = 0
 	
+	# Increment attempt count immediately when opening dialog
+	npc_attempt_counts[chat_npc.npc_name] += 1
+	var current_attempts = npc_attempt_counts[chat_npc.npc_name]
+	
+	# Check if player has exceeded attempts
+	if current_attempts > 3:
+		show_game_over_screen()
+		return
+	
 	# Update attempt counter display
 	update_chat_attempt_counter(chat_npc.npc_name)
 	
@@ -462,13 +471,11 @@ func get_topic_variety_prompt(npc_name: String, subject: String, attempt_count: 
 
 func update_attempt_counter(npc_name: String):
 	var current_attempts = npc_attempt_counts.get(npc_name, 0)
-	var attempt_number = current_attempts + 1
-	quiz_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
+	quiz_attempt_count.text = "Tentativa " + str(current_attempts) + " de 3"
 
 func update_chat_attempt_counter(npc_name: String):
 	var current_attempts = npc_attempt_counts.get(npc_name, 0)
-	var attempt_number = current_attempts + 1
-	chat_attempt_count.text = "Tentativa " + str(attempt_number) + " de 3"
+	chat_attempt_count.text = "Tentativa " + str(current_attempts) + " de 3"
 
 # Process Grande Sábio answer with validation system similar to QuizDialog
 func process_director_answer(message: String):
@@ -673,10 +680,9 @@ func display_director_result(validation_result: Dictionary):
 	print("🎯 current_npc: ", current_npc.npc_name if current_npc else "null")
 	print("🎯 current_npc_name: ", current_npc_name)
 	
-	# Increment attempt count
+	# Get current attempt count (already incremented when dialog opened)
 	var npc_name = current_npc_name if current_npc_name != "" else "Grande Sábio"
-	npc_attempt_counts[npc_name] = npc_attempt_counts.get(npc_name, 0) + 1
-	var current_attempts = npc_attempt_counts[npc_name]
+	var current_attempts = npc_attempt_counts.get(npc_name, 0)
 	
 	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
 	
@@ -812,6 +818,15 @@ func open_multiple_choice_mode(chat_npc):
 	if not npc_attempt_counts.has(chat_npc.npc_name):
 		npc_attempt_counts[chat_npc.npc_name] = 0
 	
+	# Increment attempt count immediately when opening dialog
+	npc_attempt_counts[chat_npc.npc_name] += 1
+	var current_attempts = npc_attempt_counts[chat_npc.npc_name]
+	
+	# Check if player has exceeded attempts
+	if current_attempts > 3:
+		show_game_over_screen()
+		return
+	
 	# Update attempt counter display
 	update_attempt_counter(chat_npc.npc_name)
 	
@@ -834,6 +849,15 @@ func open_open_question_mode(chat_npc):
 	# Initialize attempt count if first time
 	if not npc_attempt_counts.has(chat_npc.npc_name):
 		npc_attempt_counts[chat_npc.npc_name] = 0
+	
+	# Increment attempt count immediately when opening dialog
+	npc_attempt_counts[chat_npc.npc_name] += 1
+	var current_attempts = npc_attempt_counts[chat_npc.npc_name]
+	
+	# Check if player has exceeded attempts
+	if current_attempts > 3:
+		show_game_over_screen()
+		return
 	
 	# Update attempt counter display
 	update_attempt_counter(chat_npc.npc_name)
@@ -905,10 +929,9 @@ func _on_open_question_submit_pressed():
 	# Exibir resultado
 	display_open_question_result(validation_result)
 	
-	# Incrementar tentativas
+	# Get current attempt count (already incremented when dialog opened)
 	var npc_name = current_npc_name
-	npc_attempt_counts[npc_name] = npc_attempt_counts.get(npc_name, 0) + 1
-	var current_attempts = npc_attempt_counts[npc_name]
+	var current_attempts = npc_attempt_counts.get(npc_name, 0)
 	
 	print("📊 Tentativa ", current_attempts, " de 3 para ", npc_name)
 	
@@ -1093,9 +1116,8 @@ func _on_quiz_option_selected(option_index: int):
 		print("🎉 RESPOSTA CORRETA! Mostrando tela de sucesso...")
 		show_correct_feedback()
 	else:
-		# Wrong answer - show error feedback screen
-		npc_attempt_counts[current_npc_name] = npc_attempt_counts.get(current_npc_name, 0) + 1
-		var current_attempts = npc_attempt_counts[current_npc_name]
+		# Wrong answer - show error feedback screen (attempt already counted when opening dialog)
+		var current_attempts = npc_attempt_counts.get(current_npc_name, 0)
 		print("❌ RESPOSTA INCORRETA! Tentativa: ", current_attempts, "/3")
 		show_incorrect_feedback(current_attempts)
 
@@ -1158,7 +1180,7 @@ func send_message():
 	if message.to_lower() == "status":
 		if current_npc:
 			var attempt_count = npc_attempt_counts.get(current_npc.npc_name, 0)
-			chat_history.text += "\n[color=cyan][b]📊 STATUS:[/b] " + current_npc.npc_name + " - Tentativa: " + str(attempt_count + 1) + "[/color]"
+			chat_history.text += "\n[color=cyan][b]📊 STATUS:[/b] " + current_npc.npc_name + " - Tentativa: " + str(attempt_count) + "[/color]"
 		else:
 			chat_history.text += "\n[color=red][b]❌ Erro:[/b] Nenhum NPC selecionado[/color]"
 		return
@@ -2052,7 +2074,7 @@ func create_evaluation_prompt(npc, user_answer: String) -> String:
 	prompt += "RESPOSTA DO ALUNO: " + user_answer + "\n"
 	
 	if attempt_count > 0:
-		prompt += "TENTATIVA NÚMERO: " + str(attempt_count + 1) + "\n"
+		prompt += "TENTATIVA NÚMERO: " + str(attempt_count) + "\n"
 	
 	prompt += "\nFORMATO OBRIGATÓRIO DA RESPOSTA:\n"
 	prompt += "1. Inicie com 'PERCENTUAL: X%' onde X é o percentual de corretude (0-100)\n"
@@ -2093,9 +2115,8 @@ func _on_answer_evaluated(_result: int, response_code: int, _headers: PackedStri
 				chat_history.text += "\n[color=gold][b]🎉 PORTA DESBLOQUEADA![/b][/color]"
 				chat_history.text += "\n[color=cyan][b]Você pode fechar o chat e prosseguir para a próxima sala![/b][/color]"
 			else:
-				# Student got it wrong, increment attempt count
-				npc_attempt_counts[current_npc_name] = npc_attempt_counts.get(current_npc_name, 0) + 1
-				var current_attempts = npc_attempt_counts[current_npc_name]
+				# Student got it wrong (attempt already counted when opening dialog)
+				var current_attempts = npc_attempt_counts.get(current_npc_name, 0)
 				
 				if current_attempts >= 3:
 					# Maximum attempts reached
